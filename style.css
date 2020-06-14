@@ -442,12 +442,12 @@ content list
 }
 
 .content-list .item .date {
-  color: #ff6600;
+  color: #666666;
   display: block;
 }
 
 .content-list .item .date-inline {
-  color: #ff6600;
+  color: #666666;
 }
 
 .content-list .item .title {
