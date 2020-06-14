@@ -384,7 +384,6 @@ content list
 /*
  * line break.
 */
-p {
+body {
   word-break: break-all;
-  hyphens: auto;
 }
