@@ -338,7 +338,7 @@ Section
 }
 
 /*
-content list
+content list & p
 */
 .content-list .item {
   display: block;
@@ -348,6 +348,15 @@ content list
   margin-inline-start: 0px;
   margin-inline-end: 0px;
 
+}
+
+p {
+  display: block;
+  text-align: left;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
 }
 
 .content-list .item .date {
