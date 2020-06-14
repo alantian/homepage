@@ -31,24 +31,6 @@ ul, ol, dl, figure,
   margin-bottom: 5px;
 }
 
-/**
- * Images
- */
-img {
-  max-width: 100%;
-  vertical-align: middle;
-}
-
-/**
- * Figures
- */
-figure > img {
-  display: block;
-}
-
-figcaption {
-  font-size: 14px;
-}
 
 /**
  * Lists
@@ -93,64 +75,6 @@ a:hover {
 
 a:active {
   color: black;
-}
-
-/* 
-a {
-  color: #2a7ae2;
-  text-decoration: none;
-}
-
-a:visited {
-  color: #1756a9;
-}
-
-a:hover {
-  color: #111;
-  text-decoration: underline;
-}
-*/
-
-/**
- * Blockquotes
- */
-blockquote {
-  color: #828282;
-  border-left: 4px solid #e8e8e8;
-  padding-left: 5px;
-  font-size: 18px;
-  letter-spacing: -1px;
-  font-style: italic;
-}
-
-blockquote > :last-child {
-  margin-bottom: 0;
-}
-
-/**
- * Code formatting
- */
-pre,
-code {
-  font-size: 15px;
-  border: 1px solid #e8e8e8;
-  border-radius: 3px;
-  background-color: #eef;
-}
-
-code {
-  padding: 1px 5px;
-}
-
-pre {
-  padding: 8px 12px;
-  overflow-x: scroll;
-}
-
-pre > code {
-  border: 0;
-  padding-right: 0;
-  padding-left: 0;
 }
 
 /**
@@ -351,53 +275,8 @@ pre > code {
 }
 
 /**
- * Page content
- */
-.page-content {
-  padding: 10px 0;
-}
-
-.page-heading {
-  font-size: 20px;
-}
-
-.post-list {
-  margin-left: 0;
-  list-style: none;
-}
-
-.post-list > li {
-  margin-bottom: 10px;
-}
-
-.post-meta {
-  font-size: 14px;
-  color: #828282;
-}
-
-.post-link {
-  display: block;
-  font-size: 24px;
-}
-
-/**
  * Posts
  */
-.post-header {
-  margin-bottom: 10px;
-}
-
-.post-title {
-  font-size: 42px;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-@media screen and (max-width: 840px) {
-  .post-title {
-    font-size: 36px;
-  }
-}
 
 .post-content {
   margin-bottom: 10px;
