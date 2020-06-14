@@ -379,11 +379,3 @@ content list
   font-style: italic;
   color: black;
 }
-
-
-/*
- * line break.
-*/
-body {
-  word-break: break-all;
-}
