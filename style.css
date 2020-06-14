@@ -373,9 +373,18 @@ content list
 }
 
 /*
-emph
+ * emph
 */
 .emph {
   font-style: italic;
   color: black;
+}
+
+
+/*
+ * line break.
+*/
+p {
+  word-break: break-all;
+  hyphens: auto;
 }
