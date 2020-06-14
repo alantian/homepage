@@ -1,0 +1,220 @@
+% LaTeX file for resume
+
+\documentclass[line,margin]{cv}
+
+\usepackage[usenames,dvipsnames]{color}
+% margin control
+\usepackage{scrextend}
+
+% hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	urlcolor=Black,
+	urlbordercolor={0 0 0}
+}
+
+% line spacing
+\usepackage{setspace}
+\linespread{1.3}
+
+% for compact itemization
+\usepackage{enumitem}
+\setlist{nolistsep}
+\setlength{\itemsep}{-.08ex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% My settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% page margin
+\addtolength{\textwidth }{50pt}
+\addtolength{\oddsidemargin }{-30pt}
+
+% set paragraph margin (spacing)
+\setlength{\parskip}{1.5ex plus 0.3ex minus 0.3ex}
+
+% linespread
+\linespread{1.1}
+
+% Indented block
+\newenvironment{block}
+{
+	\begin{addmargin}[2em]{0em}% 2em left, 0em right
+}
+{
+	\end{addmargin}
+}
+
+% Section font becomes Small Capitals
+\renewcommand{\sectionfont}{\scshape}
+
+\newcommand{\myemph}{\textbf}
+
+% Use a smaller bullet for listing
+\renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+% links
+\newcommand{\SUNY}{\href{http://www.stonybrook.edu/}{State University of New York at Stony Brook}}
+\newcommand{\Google}{\href{https://www.google.com/}{Google}}
+\newcommand{\GoogleBrain}{\href{http://research.google.com/teams/brain/}{Google Brain}}
+\newcommand{\Facebook}{\href{https://www.facebook.com/}{Facebook}}
+\newcommand{\SUNYSchool}{\href{www.cs.stonybrook.edu}{Computer Science Department}}
+\newcommand{\Fudan}{\href{http://www.fudan.edu.cn/englishnew/}{Fudan University}}
+\newcommand{\FudanSchool}{\href{http://www.cs.fudan.edu.cn/}{School of Computer Science}}
+\newcommand{\MyMail}{\href{mailto:alan.yt.tian@gmail.com}{alan.yt.tian@gmail.com}}
+\newcommand{\MSRA}{\href{http://research.microsoft.com/en-us/labs/asia/default.aspx}{Microsoft Research Asia}}
+\newcommand{\DMAS}{\href{http://research.microsoft.com/en-us/groups/dmas/}{Data Management, Analytics and Services Group}}
+\newcommand{\Haixun}{\href{http://haixun.olidu.com/}{Dr.\ Haixun Wang}}
+\newcommand{\WSM}{\href{http://research.microsoft.com/en-us/groups/wsm/}{Web Search and Mining Group}}
+\newcommand{\Zhongyuan}{\href{http://research.microsoft.com/en-us/people/zhowang/}{Dr.\ Zhongyuan Wang}}
+\newcommand{\Skiena}{\href{https://www3.cs.stonybrook.edu/~skiena/}{Prof.\ Steven Skiena}}
+\newcommand{\GDM}{\href{http://gdm.fudan.edu.cn}{Graph Data Management Lab}}
+\newcommand{\Yanghua}{\href{http://gdm.fudan.edu.cn/GDMWiki/Wiki.jsp?page=Yanghuaxiao}{Prof.\ Yanghua Xiao}}
+\newcommand{\sgouws}{\href{http://research.google.com/pubs/StephanGouws.html}{Dr.\ Stephan Gouws}}
+\newcommand{\jesseengel}{\href{https://ai.google/research/people/JesseEngel}{Dr.\ Jesse Engel}}
+\newcommand{\ICPC}{\href{http://icpc.baylor.edu/}{ACM-ICPC}}
+\newcommand{\Codejam}{\href{http://code.google.com/codejam/}{Google Code Jam}}
+
+
+% compact itemize
+\newenvironment{citemize}
+{ \begin{itemize}[itemsep=-0.4ex] }
+{ \end{itemize} }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% Real staffs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\name{Yingtao Tian}
+
+\address{\textit{E-mail:} \MyMail}
+
+\begin{resume}
+
+\section{Education}
+
+	{\bf \SUNY}, New York, U.S. \hfill 2014 - 2019
+	\begin{block}
+		Ph.D, Computer Science. Advisor: \Skiena
+	\end{block}
+
+	{\bf \Fudan}, Shanghai, China. \hfill 2010 - 2014
+
+	\begin{block}
+		B.Sc., Computer Science and Technology 
+	\end{block}
+
+\section{Experience}
+
+	{\bf \GoogleBrain}, Tokyo, Japan. {\itshape Research Software Engineer} \hfill Summer 2019 - Now
+	\begin{block}
+		Research on generative models and more.
+	\end{block}
+
+	{\bf \GoogleBrain}, California, U.S. {\itshape Software Engineering Intern} \hfill Summer 2018
+	\begin{block}
+		Research on the latent space of generative models. Hosted by \jesseengel
+	\end{block}
+
+	{\bf \Facebook}, California, U.S. {\itshape Software Engineering Intern} \hfill Summer 2017
+	\begin{block}
+		Research on natural language understanding. Hosted by \Haixun
+	\end{block}
+
+	{\bf \GoogleBrain}, California, U.S. {\itshape Software Engineering Intern} \hfill Summer - Fall 2016
+	\begin{block}
+		Research on representation learning. Hosted by \sgouws
+	\end{block}
+
+	{\bf \Google}, New York, United States {\itshape Software Engineering Intern} \hfill Summer 2015
+	\begin{block}
+		User-generated activity profiling and analysis. Hosted by Dr.\ Xiaomeng Ban
+	\end{block}
+
+	{\bf \MSRA}, Beijing, China. {\itshape Research Intern} \hfill 2013
+
+	\begin{block}
+		Learning representation from large knowledge base. Hosted by: \Haixun
+
+		Concept level semantic analysis. Hosted by \Zhongyuan
+	\end{block}
+
+	{\bf \Fudan}, Shanghai, China. {\itshape Research Assistant} \hfill Fall 2012
+	\begin{block}
+		Large scale information extract from crawled web pages. Advised by \Yanghua
+	\end{block}
+
+
+\section{Publications / Working Papers}
+	{\bf  KaoKore: A Pre-modern Japanese Art Facial Expression Dataset}
+	\emph{Yingtao Tian}, Chikahiko Suzuki, Tarin Clanuwat, Mikel Bober-Irizar, Alex Lamb, Asanobu Kitamoto\\
+	\emph{To Appear in the Proceedings of the Eleventh International Conference on Computational Creativity, ICCC'20}
+
+	{\bf  A Transfer-Learnable Natural Language Interface for Databases}
+	Wenlu Wang, \emph{Yingtao Tian}, Haixun Wang, Wei-Shinn Ku\\
+	\emph{In the Proceedings of the IEEE International Conference on Data Engineering (ICDE) 2020}
+	
+	{\bf  Learning to Represent Bilingual Dictionaries}
+	Muhao Chen*, \emph{Yingtao Tian}*, Haochen Chen, Kai-Wei Chang, Steven Skiena, Carlo Zaniolo  (* Equal Contribution)\\
+	\emph{In the Proceedings of the IEEE International Conference on Data Engineering (ICDE) 2020}
+	
+	{\bf  Enhanced Network Embeddings via Exploiting Edge Attributes}
+	 Haochen Chen, Xiaofei Sun, \emph{Yingtao Tian}, Muhao Chen, Bryan Perozzi and Steven Skiena\\
+	\emph{In Proceedings of the International Conference on Information and Knowledge Management (CIKM) 2018}
+
+	{\bf Social Relation Inference via Label Propagation}
+	\emph{Yingtao Tian}, Haochen Chen, Bryan Perozzi, Muhao Chen, Xiaofei Sun and Steven Skiena\\
+	\emph{In the proceeding of the 41st European Conference on Information Retrieval (ECIR 2019)}
+	
+	{\bf DeepAnnotator: Genome Annotation with Deep Learning,}
+	Mohammad Ruhul Amin, Alisa Yurovsky, \emph{Yingtao Tian}, Steven Skiena \\
+	\emph{In Proceedings of the 9th ACM Conference on Bioinformatics, Computational Biology, and Health Informatics (ACM BCB-2018)}
+	
+	{\bf Simple Neologism Based Domain Independent Models to Predict Year of Authorship}
+	 Vivek Kulkarni, \emph{Yingtao Tian}, Parth Dandiwala, Steven Skiena \\
+	\emph{In Proceedings of the 27th International Conference on Computational Linguistics (COLING 2018)}
+
+	{\bf Co-training Embeddings of Knowledge Graphs and Entity Descriptions for Cross-lingual Entity Alignment}
+	Muhao Chen, \emph{Yingtao Tian}, Kai-Wei Chang, Steven Skiena, Carlo Zaniolo\\
+	\emph{In Proceedings of the 27th International Joint Conference on Artificial Intelligence (IJCAI), IJCAI/AAAI Press 2018.}
+	
+    {\bf Syntax-Directed Variational Autoencoder for Structured Data}
+    Hanjun Dai*, \emph{Yingtao Tian}* , Bo Dai , Steven Skiena, Le Song (* Equal Contribution)\\
+    \emph{In Proceedings of the International Conference on Learning Representations (ICLR), 2018. \\
+    Best Paper Award, NIPS 2017 workshop for Machine Learning for Molecules and Materials.}
+    
+	{\bf Embedding-based Relation Prediction for Ontology Population}
+	Muhao Chen, \emph{Yingtao Tian}, Xuelu Chen, Zijun Xue, Carlo Zaniolo\\
+	\emph{In Proceedings of the 17th SIAM International Conference on Data Mining (SDM), SIAM 2018.}
+
+    {\bf Towards End-End Generation of High-Resolution Images with Generative Adversarial Networks}
+    \href{http://make.girls.moe/#/}{[Online Demo]}
+    Yanghua Jin, Jiakai Zhang, Minjun Li, \emph{Yingtao Tian}, Huachun Zhu\\
+    \emph{Accepted and presented in spotlight, NIPS 2017 workshop for Machine Learning for Creativity and Design.}
+
+    {\bf Multilingual Knowledge Graph Embeddings for Cross-lingual Knowledge Alignment}
+    Muhao Chen, \emph{Yingtao Tian}, Mohan Yang, Carlo Zaniolo.\\
+    \emph{In Proceedings of the 26th International Joint Conference on Artificial Intelligence (IJCAI), IJCAI/AAAI Press 2017.}
+
+\section{Professional Services }
+	Reviewer, \emph{LREC 2018, COLING 2016}
+
+\section{Honors and Awards}
+	\myemph{27th place}, 35th Annual World Final of the \ICPC \,, 2011
+
+	\myemph{Gold Medal}, \ICPC\ Asia Chengdu Regional Contest, 2011
+
+	\myemph{Championship and Gold medal}, \ICPC\ Asia Amritapri Regional Contest, 2010
+
+\section{Services}
+    Assistant coach, \ICPC\ team of Fudan University \hfill 2010 - 2013
+
+    Main technical staff, \ICPC\ Shanghai Site Contest \hfill Oct.\ 2011
+
+\end{resume}
+\end{document}
