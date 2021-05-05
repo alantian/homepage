@@ -229,7 +229,8 @@ a:active {
 
 .footer-col-wrapper {
   font-size: 15px;
-  color: #828282;
+  /* color: #828282; */  
+  color: black; /* higher contrast */
   margin-left: -5px;
 }
 
