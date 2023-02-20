@@ -362,7 +362,7 @@ p {
 
 .content-list .item .date {
   color: #555555;
-  display: block;
+  float:right;
 }
 
 .content-list .item .date-inline {
