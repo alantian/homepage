@@ -363,6 +363,7 @@ p {
 .content-list .item .date {
   color: #555555;
   float:right;
+  padding-left: 1rem;
 }
 
 .content-list .item .date-inline {
