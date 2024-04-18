@@ -18,9 +18,5 @@ function compile(){
   docker run -ti --rm -v $(pwd .):/pdf bwits/pdf2htmlex pdf2htmlEX --zoom 1.3 "$FILENAME.pdf" || warning "pdf2htmlEX failed!"
 }
 
-function main() {
-  compile "cv"
-  compile "cv2"
-}
 
-main
+compile "$@"
