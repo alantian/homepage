@@ -2,6 +2,8 @@
 
 \documentclass[line,margin]{cv}
 
+\usepackage{comment}
+
 \usepackage[usenames,dvipsnames]{color}
 % margin control
 \usepackage{scrextend}
@@ -10,13 +12,13 @@
 \usepackage{hyperref}
 \hypersetup{
   colorlinks=true,
-  urlcolor=Black,
+  urlcolor=Blue,
   urlbordercolor={0 0 0}
 }
 
 % line spacing
 \usepackage{setspace}
-\linespread{1.3}
+\linespread{1.2}
 
 % for compact itemization
 \usepackage{enumitem}
@@ -64,7 +66,8 @@
 \newcommand{\SUNYSchool}{\href{www.cs.stonybrook.edu}{Computer Science Department}}
 \newcommand{\Fudan}{\href{http://www.fudan.edu.cn/englishnew/}{Fudan University}}
 \newcommand{\FudanSchool}{\href{http://www.cs.fudan.edu.cn/}{School of Computer Science}}
-\newcommand{\MyMail}{\href{mailto:alan.yt.tian@gmail.com}{alan.yt.tian@gmail.com}}
+\newcommand{\MyWebsite}{\href{https://alantian.net}{alantian.net}}
+\newcommand{\MyMail}{\href{mailto:alan.yt.tian@gmail.com}{\nolinkurl{alan.yt.tian@gmail.com}}}
 \newcommand{\MSRA}{\href{http://research.microsoft.com/en-us/labs/asia/default.aspx}{Microsoft Research Asia}}
 \newcommand{\DMAS}{\href{http://research.microsoft.com/en-us/groups/dmas/}{Data Management, Analytics and Services Group}}
 \newcommand{\Haixun}{\href{http://haixun.olidu.com/}{Dr.\ Haixun Wang}}
@@ -94,27 +97,113 @@
 
 \name{Yingtao Tian}
 
-\address{\textit{E-mail:} \MyMail}
+\address{Research Scientist \textbullet{} \GoogleDeepMind{}  / \MyMail{} / \MyWebsite}
 
 \begin{resume}
 
-\section{Experience}
+\section{Research Interests}
 
-  {\bf \GoogleDeepMind{} (formerly \GoogleBrain)} {\itshape Research Scientist} \hfill 2019 - Now
-  \begin{block}
-    Research on generative models and more (see projects and publications)
-  \end{block}
+  I am excited at combining \textbf{computational approach}, with artists, culture, humanities and designer's consideration.
+  I propose techniques and tools that have both \textbf{addressed the needs in creative settings} and \textbf{improved the core machine learning}. 
+  Leading collaborations with internal and external stake-holders.
+  More details in my \href{https://alantian.net/research_statement.pdf}{research statement}.
 
-  {\bf Internships} \hfill Periodically 2013 - 2018
-  \begin{block}
-    \GoogleBrain{},  \Facebook{}, \Google{}, \MSRA{}.
-  \end{block}
+\section{Research / Industry Experience}
+
+  {\bf \GoogleDeepMind{} (formerly \GoogleBrain)} {Research Scientist} \hfill 2019 - Present
+    \begin{itemize}
+      \item Proposed generating artifacts with artistical discretion, 
+        proposing novel from of abstract art, multiple text prompts handling and collective intelligence.
+      \item Established several machine learning-boosted tools for historical and cultural works, 
+        pioneering in ML approaches for pre-modern japanese artworks, longest consecutive typhoon satellite image dataset, historical figure analysis, and calligraphy generation for CJK characters.
+      \item Pushing forwarding advances for machine learning techniques in black-box optimization,
+        pioneering in evolution strategy, an gradient-free optimization technique,
+        and also proposing LLM and transformer based approaches to black-box optimizations.
+    \end{itemize}
+
+  {\bf Internships} \GoogleBrain{},  \Facebook{}, \Google{}, \MSRA{} \hfill Periodically 2013 - 2018
+    \begin{itemize}
+      \item Proposed latent space transfer with latent model.
+      \item Implemented natural language interface to database system.
+    \end{itemize}
+
+
+\section{Major Publications}
+
+  \textbf{Generating Artifacts with Artistical Discretion}
+
+  \href{https://arxiv.org/abs/2109.08857}{Modern Evolution Strategies for Creativity: Fitting Concrete Images and Abstract Concepts}.
+  \textbf{Yingtao Tian}, David Ha.
+  \emph{Proceedings of EvoMUSART 2022}
+
+  \href{https://arxiv.org/abs/2204.08472}{Simultaneous Multiple-Prompt Guided Generation Using Differentiable Optimal Transport}.
+  \textbf{Yingtao Tian}, David Ha, Marco Cuturi. \emph{Proceeding of ICCC 2022}
+
+  \href{https://direct.mit.edu/isal/proceedings-pdf/isal/35/112/2149148/isal_a_00676.pdf}{Evolving Collective AI: Simulation of Ants Communicating via Chemicals}.
+  Ryosuke Takata, Yujin Tang, \textbf{Yingtao Tian}, Norihiro Maruyama, Hiroki Kojima, Takashi Ikegami. 
+  \emph{The 2023 Conference on Artificial Life}
+
+  \textbf{Machine learning-Boosted Tools for Historical and Cultural works}
+
+  \href{https://arxiv.org/abs/2002.08595}{KaoKore: A Pre-modern Japanese Art Facial Expression Dataset}.
+  \textbf{Yingtao Tian}, Chikahiko Suzuki, Tarin Clanuwat, Mikel Bober-Irizar, Alex Lamb, Asanobu Kitamoto. 
+  \emph{Proceeding of ICCC 2020}
+
+  \href{https://arxiv.org/abs/2106.02267}{Ukiyo-e Analysis and Creativity with Attribute and Geometry Annotation}.
+  \textbf{Yingtao Tian}, Tarin Clanuwat, Chikahiko Suzuki, Asanobu Kitamoto. 
+  \emph{Proceeding of ICCC 2021}
+
+  \href{https://aclanthology.org/2023.emnlp-main.266/}{MingOfficial: A Ming Official Career Dataset and a Historical Context-Aware Representation Learning Framework}
+  You-Jun Chen, Hsin-Yi Hsieh, Yu Tung Lin, \textbf{Yingtao Tian}, Bert Chan, Yu-Sin Liu, Yi-Hsuan Lin, Richard Tzong-Han Tsai. 
+  \emph{Proceeding of EMNLP 2023}
+
+  \href{https://arxiv.org/abs/2311.02665}{Digital Typhoon: Long-term Satellite Image Dataset for the Spatio-Temporal Modeling of Tropical Cyclones}.
+  Asanobu Kitamoto, Jared Hwang, Bastien Vuillod, Lucas Gautier, \textbf{Yingtao Tian}, Tarin Clanuwat. 
+  \emph{Proceeding of NeurIPS 2023 Systems Datasets and Benchmarks Track}
+
+  \href{https://arxiv.org/abs/2404.05212}{DiffCJK: Conditional Diffusion Model for High-Quality and Wide-coverage CJK Character Generation}.
+  \textbf{Yingtao Tian} \emph{Proceeding of ICCC 2024}
+
+  \textbf{\textsc{Advancing Machine Learning Techniques in Black-Box Optimization}}
+
+  \href{https://arxiv.org/abs/2202.05008}{EvoJAX: Hardware-Accelerated Neuroevolution}
+  Yujin Tang, \textbf{Yingtao Tian}, David Ha.   \emph{Proceeding of GECCO 2022}
+
+  \href{https://openreview.net/forum?id=s6qtLyR6uJ}{NeuroEvoBench: Benchmarking Neuroevolution for Large-Scale Machine Learning Applications}.
+  Robert Tjarko Lange, Yujin Tang, \emph{Yingtao Tian}. \emph{Proceeding of NeurIPS 2023 Systems Datasets and Benchmarks Track}
+
+  \href{https://arxiv.org/abs/2304.10770}{DEIR: Efficient and Robust Exploration through Discriminative-Model-Based Episodic Intrinsic Rewards}.
+  Shanchuan Wan, Yujin Tang, \textbf{Yingtao Tian}, Tomoyuki Kaneko. \emph{IProceeding of IJCAI 2023}
+
+  \href{https://arxiv.org/abs/2402.18381}{Large Language Models As Evolution Strategies}.
+  Robert Tjarko Lange, \textbf{Yingtao Tian}, Yujin Tang. \emph{Proceeding of GECCO 2024}
+
+  \href{https://arxiv.org/abs/2403.02985}{Evolution Transformer: In-Context Evolutionary Optimization}.
+  Robert Tjarko Lange, \textbf{Yingtao Tian}, Yujin Tang. \emph{Proceeding of GECCO 2024}
+
+  \href{https://arxiv.org/abs/2403.02985}{Position Paper: Leveraging Fuoundational Models for Black-Box Optimization: Benefits, Challenges, and Future Directions}.
+  Xingyou Song, \textbf{Yingtao Tian}, Robert Tjarko Lange, Chansoo Lee, Yujin Tang, Yutian Chen \emph{Proceeding of ICML 2024}
+
+
+  \textbf{Representation Learning for Data in Multiple Modalities}
+
+  \href{https://arxiv.org/abs/1808.03726}{Learning to Represent Bilingual Dictionaries}.
+  Muhao Chen*, \textbf{Yingtao Tian*}, Haochen Chen, Kai-Wei Chang, Steven Skiena, Carlo Zaniolo. \emph{In the Proceedings of the SIGNLL Conference on Computational Natural Language Learning (CoNLL) 2019}
+
+  \href{http://www.mlgworkshop.org/2018/papers/MLG2018_paper_58.pdf}{Social Relation Inference via Label Propagation}.
+  \textbf{Yingtao Tian*}, Haochen Chen, Bryan Perozzi, Muhao Chen, Xiaofei Sun, Steven Skiena. \emph{In the proceeding of the 41st European Conference on Information Retrieval (ECIR 2019)}
+
+  \href{http://www.mlgworkshop.org/2018/papers/MLG2018_paper_58.pdf}{Syntax-Directed Variational Autoencoder for Structured Data}.
+  Hanjun Dai*, \textbf{Yingtao Tian*}, Bo Dai, Steven Skiena, Le Song. \emph{In Proceedings of the International Conference on Learning Representations (ICLR) 2018}
+
+
 
 \section{Education}
 
   {\bf \SUNY}, New York, U.S. \hfill 2014 - 2019
   \begin{block}
-    Ph.D, Computer Science. Advisor: \Skiena
+    Ph.D, Computer Science. Advisor: \Skiena{} \\
+    Thesis: Representation Learning-based Approaches for Modeling Data in Multiple Modalities
   \end{block}
 
   {\bf \Fudan}, Shanghai, China. \hfill 2010 - 2014
@@ -124,70 +213,7 @@
   \end{block}
 
 
-
-\section{Major Publications}
-
-  In my research I aim at combining \textbf{computational approach}, with {generative/creative settings} with artists, culture, humanities and designer's consideration, in a way that the considerations are met while machine learning can help boosting the performances. To do so, I propose following techniques and tools that have both {addressed the needs in creative settings} and \emph{advances in core machine learning}. See more details in my research statement {\url{https://alantian.net/research_statement.pdf}}.
-
-  \textbf{(1) Generating Artifacts with Artistical Discretion}:  Co-design of generating algorithm and generating algorithm is needed to exercise such discretion.
-  In my work \underline{ES-CLIP} and \underline{ES-3D} I {design one particular abstract art} form, framing as synthesizing painting by placing semi-transparent triangles respectively on 2D canvas and 3D space. In my work \underline{Simultaneous Multiple-Prompt} I designed a fully end-to-end differential approach that can make any text-to-image models adapting to {multiple text prompts coherently}. In our work \underline{Evolving Collective AI} we bridge {biological collective intelligence} with artificial intelligence, by constructing {designs of agents} inspired by the biological ants
-
-  \underline{ES-CLIP}: {Modern Evolution Strategies for Creativity: Fitting Concrete Images and Abstract Concepts}.
-  \emph{Yingtao Tian}, David Ha.
-  \emph{In the Proceedings of the The 11th International Conference on Artificial Intelligence in Music, Sound, Art and Design (EvoMUSART) 2022.}
-
-  \underline{ES-3D}: {Evolving Three Dimension (3D) Abstract Art: Fitting Concepts by Language}.
-  \emph{Yingtao Tian} \emph{Working paper}
-
-  \underline{Simultaneous Multiple-Prompt}: {Simultaneous Multiple-Prompt Guided Generation Using Differentiable Optimal Transport}.
-  \emph{Yingtao Tian}, David Ha, Marco Cuturi. \emph{In the Proceedings of the twelfth International Conference on Computational Creativity, ICCC'22}
-
-  \underline{Evolving Collective AI}: {Evolving Collective AI: Simulation of Ants Communicating via Chemicals}.
-  Ryosuke Takata, Yujin Tang, \emph{Yingtao Tian}, Norihiro Maruyama, Hiroki Kojima, Takashi Ikegami. \emph{The 2023 Conference on Artificial Life}
-
-  \textbf{(2) Machine learning-Boosted Tools for Historical and Cultural works}:   We encounter a lot of works related to historical and cultural aspects where faithful adherence to a few paradigms is a must.
-  My work \underline{KaoKore} and \underline{ARC Ukiyo-e Face} organize {facial expression images} from 14-16 century and 17-19 century Japanese artworks and enable {computational analysis} to such artworks. Our work \underline{MingOfficial} proposes LLMs and GNNs to learn representations from structured data and raw historical record, enabling {identifing historical figures} with interesting traits.
-  We also, in our work \underline{Digital Typhoon}, organize the longest consecutive typhoon satellite image dataset in modern history to helpf {weather prediction}. 
-  Forthermore, by designing proper diffusion models, I propose \underline{DiffCJK} to {generate glyphs of new calligraphy and typology styles} for hundreds of thousands CJK characters.
-
-  \underline{KaoKore}: {KaoKore: A Pre-modern Japanese Art Facial Expression Dataset}.
-  \emph{Yingtao Tian}, Chikahiko Suzuki, Tarin Clanuwat, Mikel Bober-Irizar, Alex Lamb, Asanobu Kitamoto. \emph{In the Proceedings of the Eleventh International Conference on Computational Creativity, ICCC'20}
-
-  \underline{ARC Ukiyo-e Face}: {Ukiyo-e Analysis and Creativity with Attribute and Geometry Annotation}.
-  \emph{Yingtao Tian}, Tarin Clanuwat, Chikahiko Suzuki, Asanobu Kitamoto. \emph{In the Proceedings of the Eleventh International Conference on Computational Creativity, ICCC'21}
-
-  \underline{MingOfficial}: {MingOfficial: A Ming Official Career Dataset and a Historical Context-Aware Representation Learning Framework}
-  You-Jun Chen, Hsin-Yi Hsieh, Yu Tung Lin, \emph{Yingtao Tian}, Bert Chan, Yu-Sin Liu, Yi-Hsuan Lin, Richard Tzong-Han Tsai. \emph{The 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP 2023)}
-
-  \underline{Digital Typhoon}: {Digital Typhoon: Long-term Satellite Image Dataset for the Spatio-Temporal Modeling of Tropical Cyclones}.
-  Asanobu Kitamoto, Jared Hwang, Bastien Vuillod, Lucas Gautier, \emph{Yingtao Tian}, Tarin Clanuwat. \emph{Thirty-seventh Conference on Neural Information Processing (NeurIPS 2023) Systems Datasets and Benchmarks Track}
-
-  \underline{DiffCJK}: {DiffCJK: Conditional Diffusion Model for High-Quality and Wide-coverage CJK Character Generation}.
-  \emph{Yingtao Tian} \emph{International Conference on Computational Creativity (ICCC) 2024}
-
-  \textbf{(3) Advancing Machine Learning Techniques}: The advances in the creative models cannot be without advances in core machine learning research.
-  Many works concern {evolution strategy}, an gradient-free optimization technique other than the more commonly used gradient based methods. 
-  We propose the \underline{EvoJAX}, a scalable, general purpose, hardware-accelerated {neuroevolution toolkit}; \underline{NeuroEvoBench}, a new {benchmark of evolutionary optimization methods} for Deep Learning and meta-learned tasks.  
-  We further extend evolution strategy with LLM: \underline{EvoLLM} implements a type of {black-box recombination operator using LLM through Evolution}, and \underline{EvoTransformer} flexibly characterizes a family of {evolution strategies with Transformer architecture}.
-  Some work also concerns {reinforcement learning}: In our work \underline{DEIR} we propose a theoretically-backend intrinsic reward from conditional mutual information to quickly learn policies.
-
-  \underline{EvoJAX}: {EvoJAX: Hardware-Accelerated Neuroevolution}
-  Yujin Tang, \emph{Yingtao Tian}, David Ha.   \emph{In the Proceedings of the Genetic and Evolutionary Computation Conference (GECCO) 2022}
-
-  \underline{NeuroEvoBench} {NeuroEvoBench: Benchmarking Neuroevolution for Large-Scale Machine Learning Applications}.
-  Robert Tjarko Lange, Yujin Tang, \emph{Yingtao Tian}. \emph{Thirty-seventh Conference on Neural Information Processing (NeurIPS 2023) Systems Datasets and Benchmarks Track}
-
-  \underline{EvoLLM}: {Large Language Models As Evolution Strategies}.
-  Robert Tjarko Lange, \emph{Yingtao Tian}, Yujin Tang. \emph{The Genetic and Evolutionary Computation Conference (GECCO) 2024}
-
-  \underline{EvoTransformer}: {Evolution Transformer: In-Context Evolutionary Optimization}.
-  Robert Tjarko Lange, \emph{Yingtao Tian}, Yujin Tang. \emph{The Genetic and Evolutionary Computation Conference (GECCO) 2024}
-
-  \underline{DIER}: {DEIR: Efficient and Robust Exploration through Discriminative-Model-Based Episodic Intrinsic Rewards}.
-  Shanchuan Wan, Yujin Tang, \emph{Yingtao Tian}, Tomoyuki Kaneko. \emph{In the Proceedings of the 32nd International Joint Conference on Artificial Intelligence, IJCAI-23}
-
-
-\section{(Old) Awards in Competitive Programming}
+\section{(Old) Awards}
   \myemph{27th place}, 35th Annual World Final of the \ICPC \,, 2011
 
   \myemph{Gold Medal}, \ICPC\ Asia Chengdu Regional Contest, 2011
