@@ -8,6 +8,10 @@
 % margin control
 \usepackage{scrextend}
 
+
+\usepackage{xhfill}
+
+
 % hyperlinks
 \usepackage{hyperref}
 \hypersetup{
@@ -53,6 +57,13 @@
 \renewcommand{\sectionfont}{\scshape}
 
 \newcommand{\myemph}{\textbf}
+
+% change hrulefill thickness, which is used below
+\renewcommand{\hrulefill}{%
+  \leavevmode\leaders\hrule height 1pt\hfill\kern0pt }
+
+% pub list header. see https://tex.stackexchange.com/questions/15119/draw-horizontal-line-left-and-right-of-some-text-a-single-line
+\newcommand*\ruleline[1]{\par\noindent\raisebox{.8ex}{\makebox[\linewidth]{\hrulefill\hspace{1ex}\raisebox{-.8ex}{#1}\hspace{1ex}\hrulefill}}}
 
 % Use a smaller bullet for listing
 \renewcommand{\labelitemi}{$\vcenter{\hbox{\tiny$\bullet$}}$}
@@ -112,26 +123,35 @@
 
   {\bf \GoogleDeepMind{} (formerly \GoogleBrain)} {Research Scientist} \hfill 2019 - Present
     \begin{itemize}
-      \item Proposed generating artifacts with artistical discretion, 
-        proposing novel from of abstract art, multiple text prompts handling and collective intelligence.
-      \item Established several machine learning-boosted tools for historical and cultural works, 
-        pioneering in ML approaches for pre-modern japanese artworks, longest consecutive typhoon satellite image dataset, historical figure analysis, and calligraphy generation for CJK characters.
-      \item Pushing forwarding advances for machine learning techniques in black-box optimization,
-        pioneering in evolution strategy, an gradient-free optimization technique,
-        and also proposing LLM and transformer based approaches to black-box optimizations.
+      \item \textbf{Generating artifacts with artistical discretion.}
+        \begin{itemize}
+          \item Proposed novel models for abstract art, multiple text prompts and collective intelligence.
+        \end{itemize}
+      \item\textbf{Machine learning-boosted tools for historical and cultural works.}
+        \begin{itemize}
+          \item Pioneered in making ML-ready dateset for pre-modern japanese artworks / longest consecutive typhoon satellite image.
+          \item Proposed ML-based historical figure analysis / calligraphy generation for CJK characters.
+        \end{itemize}
+      \item \textbf{Advancing Machine Learning Techniques in Black-Box Optimization.}
+        \begin{itemize}
+          \item Pioneered in fitting evolution strategy, an black-box optimization, to modern settings.
+          \item Proposing fundation models (LLMs and transformers) based approaches to black-box optimizations.
+        \end{itemize}
     \end{itemize}
 
   {\bf Internships} \GoogleBrain{},  \Facebook{}, \Google{}, \MSRA{} \hfill Periodically 2013 - 2018
     \begin{itemize}
-      \item Proposed latent space transfer with latent model.
+      \item Proposed latent space transfer for multi-modality tasks.
       \item Implemented natural language interface to database system.
     \end{itemize}
 
 
 \section{Major Publications}
 
-  \textbf{Generating Artifacts with Artistical Discretion}
+  \ruleline{\textbf{Generating Artifacts with Artistical Discretion}}
 
+  {
+  \small
   \href{https://arxiv.org/abs/2109.08857}{Modern Evolution Strategies for Creativity: Fitting Concrete Images and Abstract Concepts}.
   \textbf{Yingtao Tian}, David Ha.
   \emph{Proceedings of EvoMUSART 2022}
@@ -142,9 +162,12 @@
   \href{https://direct.mit.edu/isal/proceedings-pdf/isal/35/112/2149148/isal_a_00676.pdf}{Evolving Collective AI: Simulation of Ants Communicating via Chemicals}.
   Ryosuke Takata, Yujin Tang, \textbf{Yingtao Tian}, Norihiro Maruyama, Hiroki Kojima, Takashi Ikegami. 
   \emph{The 2023 Conference on Artificial Life}
+  }
 
-  \textbf{Machine learning-Boosted Tools for Historical and Cultural works}
+  \ruleline{\textbf{Machine learning-Boosted Tools for Historical and Cultural works}}
 
+  {
+  \small
   \href{https://arxiv.org/abs/2002.08595}{KaoKore: A Pre-modern Japanese Art Facial Expression Dataset}.
   \textbf{Yingtao Tian}, Chikahiko Suzuki, Tarin Clanuwat, Mikel Bober-Irizar, Alex Lamb, Asanobu Kitamoto. 
   \emph{Proceeding of ICCC 2020}
@@ -163,9 +186,12 @@
 
   \href{https://arxiv.org/abs/2404.05212}{DiffCJK: Conditional Diffusion Model for High-Quality and Wide-coverage CJK Character Generation}.
   \textbf{Yingtao Tian} \emph{Proceeding of ICCC 2024}
+  }
 
-  \textbf{\textsc{Advancing Machine Learning Techniques in Black-Box Optimization}}
+  \ruleline{\textbf{Advancing Machine Learning Techniques in Black-Box Optimization}}
 
+  {
+  \small
   \href{https://arxiv.org/abs/2202.05008}{EvoJAX: Hardware-Accelerated Neuroevolution}
   Yujin Tang, \textbf{Yingtao Tian}, David Ha.   \emph{Proceeding of GECCO 2022}
 
@@ -183,10 +209,12 @@
 
   \href{https://arxiv.org/abs/2403.02985}{Position Paper: Leveraging Fuoundational Models for Black-Box Optimization: Benefits, Challenges, and Future Directions}.
   Xingyou Song, \textbf{Yingtao Tian}, Robert Tjarko Lange, Chansoo Lee, Yujin Tang, Yutian Chen \emph{Proceeding of ICML 2024}
+  }
 
+  \ruleline{\textbf{Representation Learning for Data in Multiple Modalities}}
 
-  \textbf{Representation Learning for Data in Multiple Modalities}
-
+  {
+  \small
   \href{https://arxiv.org/abs/1808.03726}{Learning to Represent Bilingual Dictionaries}.
   Muhao Chen*, \textbf{Yingtao Tian*}, Haochen Chen, Kai-Wei Chang, Steven Skiena, Carlo Zaniolo. \emph{In the Proceedings of the SIGNLL Conference on Computational Natural Language Learning (CoNLL) 2019}
 
@@ -195,7 +223,9 @@
 
   \href{http://www.mlgworkshop.org/2018/papers/MLG2018_paper_58.pdf}{Syntax-Directed Variational Autoencoder for Structured Data}.
   Hanjun Dai*, \textbf{Yingtao Tian*}, Bo Dai, Steven Skiena, Le Song. \emph{In Proceedings of the International Conference on Learning Representations (ICLR) 2018}
+  }
 
+  \hrulefill
 
 
 \section{Education}
@@ -213,7 +243,7 @@
   \end{block}
 
 
-\section{(Old) Awards}
+\section{Awards}
   \myemph{27th place}, 35th Annual World Final of the \ICPC \,, 2011
 
   \myemph{Gold Medal}, \ICPC\ Asia Chengdu Regional Contest, 2011
