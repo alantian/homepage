@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<!--
+  CEDAR: ALIFE 2026 talk (Yingtao Tian, Sakana AI)
+  Single-file animated slide deck; assets in images/ and js/, no network needed.
+  Keys: arrow-right/space = next build step or slide, arrow-left = back,
+  F = fullscreen, Home/End = jump. #/N/F deep-links slide N at build step F;
+  ?still=1 renders every animation at its end state.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEDAR · ALIFE 2026</title>
+<style>
+  /* ============ tokens ============ */
+  :root{
+    --paper:#FAFAF7;          /* stage background */
+    --ink:#22252A;            /* body text */
+    --ink-soft:#5A5F66;       /* secondary text */
+    --teal:#0F6B66;           /* primary accent: intro/section color */
+    --orange:#CC4400;         /* method section  (paper: CEDAR-Claude color) */
+    --purple:#5533AA;         /* results section (paper: Optuna-full color) */
+    --magenta:#AA3366;        /* closing section (paper: population color) */
+    --green:#00AA44;          /* paper: CEDAR-GPT color */
+    --line:#D8D6CE;
+    --card:#FFFFFF;
+    --mono:"SF Mono","Cascadia Code","JetBrains Mono","Fira Mono",Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{background:#111312;font-family:var(--sans);overflow:hidden;touch-action:manipulation}
+  #rotate{display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9;
+          background:rgba(34,37,42,.85);color:#EDEEE9;font:13px var(--mono);letter-spacing:.05em;
+          padding:7px 14px;border-radius:16px;pointer-events:none}
+  @media (orientation:portrait) and (pointer:coarse){#rotate{display:block}}
+
+  /* ============ stage: fixed 1280x720, scaled to fit ============ */
+  #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #stage{width:1280px;height:720px;flex:0 0 auto;position:relative;background:var(--paper);
+         box-shadow:0 0 60px rgba(0,0,0,.5);transform-origin:center center}
+
+  .slide{position:absolute;inset:0;padding:64px 72px 88px;display:none;flex-direction:column}
+  .slide.current{display:flex}
+
+  /* ============ type ============ */
+  .eyebrow{font-family:var(--mono);font-size:15px;letter-spacing:.14em;color:var(--sec,#0F6B66);
+           text-transform:uppercase;margin-bottom:10px}
+  h1{font-size:36px;line-height:1.15;color:var(--ink);letter-spacing:-.015em;margin-bottom:26px;font-weight:700}
+  h1 .accent{color:var(--sec,#0F6B66)}
+  p,li{font-size:21px;line-height:1.5;color:var(--ink)}
+  li{margin-bottom:10px}
+  ul{padding-left:26px}
+  .soft{color:var(--ink-soft)}
+  .small{font-size:17px;line-height:1.45}
+  .tiny{font-size:14.5px;line-height:1.4}
+  b{font-weight:650}
+  .kicker{margin-top:auto;padding-top:16px;font-size:21px;color:var(--sec,#0F6B66);font-weight:650}
+
+  .goalbox{font-family:var(--mono);font-size:16.5px;line-height:1.55;background:var(--card);
+           border:1px solid var(--line);border-left:4px solid var(--teal);padding:16px 20px;
+           color:var(--ink);border-radius:2px}
+  .quote{font-family:var(--mono);font-size:15.5px;line-height:1.5;background:var(--card);
+         border:1px solid var(--line);padding:12px 16px;border-radius:2px;margin-bottom:12px}
+  .formula{font-family:var(--mono);font-size:19px;background:var(--card);border:1px solid var(--line);
+           padding:14px 18px;border-radius:2px;color:var(--ink)}
+  .pop{color:var(--magenta)} .pol{color:var(--orange)} .res{color:var(--teal)}
+
+  .cols{display:flex;gap:40px;align-items:flex-start;flex:1;min-height:0}
+  .col{flex:1;min-width:0}
+  figure{text-align:center}
+  figure img{max-width:100%;height:auto}
+  figcaption{font-size:14.5px;color:var(--ink-soft);margin-top:8px;line-height:1.4}
+  .imgcard{background:var(--card);border:1px solid var(--line);padding:10px;border-radius:2px}
+
+  table{border-collapse:collapse;font-size:18px}
+  th,td{padding:7px 16px;text-align:left}
+  td.num{text-align:right;font-family:var(--mono);font-size:16.5px}
+  thead th{border-bottom:2px solid var(--ink);font-weight:650}
+  tbody tr{border-bottom:1px solid var(--line)}
+
+  /* title slide */
+  .title-slide{justify-content:center;padding-bottom:64px}
+  .wordmark{font-family:var(--mono);font-size:114px;font-weight:700;letter-spacing:.02em;color:var(--ink)}
+  .wordmark .l{display:inline-block;color:var(--teal)}
+  .subtitle{font-size:34px;color:var(--ink);margin:20px 0 8px;max-width:980px;line-height:1.3}
+  .meta{font-size:22px;color:var(--ink-soft);margin-top:28px}
+  .prompt-line{font-family:var(--mono);font-size:21px;color:var(--teal);margin-top:42px;display:flex}
+  .prompt-line .typed{overflow:hidden;white-space:nowrap}
+
+  /* closing + title: sakana.ai fish school (p5 sketch) behind content */
+  .fish-slot{position:absolute;inset:0;z-index:0}
+  .fish-slot canvas{pointer-events:none}
+  .fishy>*:not(.fish-slot){position:relative;z-index:1}
+  .big2{font-size:44px;line-height:1.3;color:var(--ink);font-weight:700;letter-spacing:-.01em}
+  .big2 .accent{color:var(--sec,#AA3366)}
+
+  /* DYNAMO listing card (slide 2) */
+  .dyncard{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:8px 10px;
+           max-height:452px;overflow:hidden;position:relative}
+  .dyncard pre{font-family:var(--mono);font-size:4.9px;line-height:1.02;color:#43474D;
+               columns:2;column-gap:12px;text-align:left;white-space:normal}
+  .dyncard .dl:empty{height:2.5px}
+  .dyncard .dl{display:block;white-space:pre-wrap;word-break:break-all;padding-left:16ch;text-indent:-16ch}
+  /* typed goal + variable pairing (slide 2) */
+  .goalbox i.tw{visibility:hidden;font-style:normal}
+  .goalbox i.tw.on{visibility:visible}
+  .gv{border-radius:2px;transition:background .3s}
+  .gv[data-v="1"].sel{background:rgba(170,51,102,.22)}
+  .gv[data-v="2"].sel{background:rgba(15,107,102,.20)}
+  .gv[data-v="3"].sel{background:rgba(204,68,0,.20)}
+  .codecircle{position:absolute;border:1.6px solid;border-radius:3px;opacity:0;
+              transform:scale(.7);transition:opacity .35s,transform .35s;pointer-events:none}
+  .codecircle.on{opacity:1;transform:none}
+  .cc1{border-color:#AA3366}.cc2{border-color:#0F6B66}.cc3{border-color:#CC4400}
+  .depsvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+  .still .goalbox i.tw{visibility:visible}
+  @media (prefers-reduced-motion: reduce){.goalbox i.tw{visibility:visible}}
+  .dl-num{color:#A8ADB3}
+  .dl-kw{color:var(--orange);font-weight:700}
+  .dl-fn{color:var(--teal)}
+  .dl-cm{color:#A8ADB3;font-style:italic}
+
+  /* ============ figure build system ============ */
+  .fig{position:relative;display:inline-block;max-width:100%;line-height:0}
+  .fig img{display:block;margin:0 auto}
+  .cover{position:absolute;background:#fff;z-index:2}
+  .cover.onpaper{background:var(--paper)}
+  /* keypress-revealed covers: fade away */
+  .cover.frag{opacity:1;transition:opacity .5s ease}
+  .cover.frag.on{opacity:0}
+  /* auto covers: draw-on (left to right) and grow (top to bottom) */
+  .a-drawx{transform-origin:right center}
+  .a-growy{transform-origin:center bottom}
+
+  /* ============ fragments (keypress builds) ============ */
+  .frag:not(.cover):not(.hl){opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease}
+  .frag.on:not(.cover):not(.hl){opacity:1;transform:none}
+
+
+  /* ============ ambient animations (auto, restart on slide entry) ============ */
+  @media (prefers-reduced-motion: no-preference){
+    .slide.current{animation:enter .3s ease-out}
+    @keyframes enter{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+    @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    @keyframes drawx{to{transform:scaleX(0)}}
+    @keyframes growy{to{transform:scaleY(0)}}
+    @keyframes pop{0%{opacity:0;transform:scale(.88)}100%{opacity:1;transform:scale(1)}}
+    @keyframes kb{from{transform:scale(1) translate(0,0)}to{transform:scale(1.07) translate(-1.6%,-1.2%)}}
+    @keyframes blink{50%{opacity:0}}
+    @keyframes type{from{width:0}to{width:31ch}}
+    @keyframes railpulse{50%{opacity:.4}}
+    @keyframes hlrow{to{background:#E7F5EC;box-shadow:inset 3px 0 0 var(--green)}}
+    .current tr.hl-auto{animation:hlrow .6s 2.4s both}
+
+    .current .a-rise{animation:rise .55s both}
+    .current .a-rise.d1{animation-delay:.25s}
+    .current .a-rise.d2{animation-delay:.55s}
+    .current .a-rise.d3{animation-delay:.9s}
+    .current .a-rise.d4{animation-delay:1.4s}
+    .current .a-rise.d5{animation-delay:2.9s}
+    .current .stagger>*{animation:rise .5s both}
+    .current .stagger>*:nth-child(1){animation-delay:.1s}
+    .current .stagger>*:nth-child(2){animation-delay:.24s}
+    .current .stagger>*:nth-child(3){animation-delay:.38s}
+    .current .stagger>*:nth-child(4){animation-delay:.52s}
+    .current .stagger>*:nth-child(5){animation-delay:.66s}
+    .current .stagger>*:nth-child(6){animation-delay:.8s}
+    .current .stagger>*:nth-child(7){animation-delay:.94s}
+    .current .stagger>*:nth-child(8){animation-delay:1.08s}
+    .current .stagger.late>*:nth-child(1){animation-delay:2.1s}
+    .current .stagger.late>*:nth-child(2){animation-delay:2.35s}
+    .current .stagger.late>*:nth-child(3){animation-delay:2.6s}
+    .current .stagger.fast>*{animation-duration:.35s}
+    .current .stagger.fast>*:nth-child(1){animation-delay:.35s}
+    .current .stagger.fast>*:nth-child(2){animation-delay:.43s}
+    .current .stagger.fast>*:nth-child(3){animation-delay:.51s}
+    .current .stagger.fast>*:nth-child(4){animation-delay:.59s}
+    .current .stagger.fast>*:nth-child(5){animation-delay:.67s}
+    .current .stagger.fast>*:nth-child(6){animation-delay:.75s}
+    .current .stagger.fast>*:nth-child(7){animation-delay:.83s}
+    .current .stagger.fast>*:nth-child(8){animation-delay:.91s}
+    .current .a-drawx{animation:drawx 1.5s .45s cubic-bezier(.55,0,.25,1) both}
+    .current .a-drawx.d2{animation-delay:1.7s;animation-duration:1.3s}
+    .current .a-growy{animation:growy 1.35s .4s ease both}
+    .current .a-pop{animation:pop .6s cubic-bezier(.2,1.4,.4,1) both}
+    .current .a-kenburns{animation:kb 15s ease-in-out infinite alternate}
+    .caret{animation:blink 1.1s steps(1) infinite}
+    .current .typed{animation:type 1.7s steps(31,end) 1.1s both}
+    #rail .pulse{animation:railpulse 1.6s ease-in-out infinite}
+  }
+  /* reduced motion: everything visible, no covers, no movement */
+  @media (prefers-reduced-motion: reduce){
+    .cover{display:none!important}
+    .frag:not(.cover){opacity:1!important;transform:none!important}
+    .typed{width:auto!important}
+    tr.hl-auto{background:#E7F5EC;box-shadow:inset 3px 0 0 var(--green)}
+  }
+  /* ?still mode: jump every animation to its end state (deterministic screenshots) */
+  .still .slide.current,.still .current *{animation-duration:0s!important;animation-delay:0s!important;transition-duration:0s!important}
+
+  /* ============ chrome: tree progress rail + counter ============ */
+  #rail{position:absolute;left:72px;bottom:18px;height:52px}
+  #counter{position:absolute;right:72px;bottom:30px;font-family:var(--mono);
+           font-size:14px;color:var(--ink-soft)}
+  #help{position:absolute;left:0;right:0;bottom:-34px;text-align:center;color:#666;
+        font:13px var(--mono);letter-spacing:.06em}
+
+  @media print{
+    body{background:#fff;overflow:visible}
+    #viewport{position:static;display:block}
+    #stage{transform:none!important;box-shadow:none;width:1280px;height:720px;page-break-after:always}
+    .slide{display:flex!important;position:relative;height:720px;page-break-after:always}
+    .cover{display:none!important}
+    .frag:not(.cover){opacity:1!important;transform:none!important}
+    .typed{width:auto!important}
+    .goalbox i.tw{visibility:visible}
+    tr.hl-auto{background:#E7F5EC;box-shadow:inset 3px 0 0 var(--green)}
+    #rail,#counter,#help,.fish-slot{display:none}
+  }
+</style>
+</head>
+<body>
+<div id="rotate">rotate for the best view</div>
+<div id="viewport">
+<div id="stage">
+
+<!-- 1 ================================================================ -->
+<section class="slide title-slide stagger fishy" data-sec="teal">
+  <img src="images/sakana-logo.png" alt="Sakana AI" style="position:absolute;top:60px;right:72px;height:46px">
+  <div class="fish-slot" aria-hidden="true"></div>
+  <div class="wordmark"><span class="l">C</span><span class="l">E</span><span class="l">D</span><span class="l">A</span><span class="l">R</span></div>
+  <div class="soft" style="margin-top:6px;letter-spacing:.04em;font-size:19px"><b>C</b>omplex-systems <b>E</b>xploration and <b>D</b>esign via <b>A</b>gent-Orchestrated <b>R</b>efinement</div>
+  <div class="subtitle">Agent-Orchestrated Tree Search for Goal-Directed Optimization of Complex&nbsp;Systems</div>
+  <div class="meta">Yingtao Tian &nbsp;/&nbsp; Sakana AI &nbsp;/&nbsp; <span style="font-family:var(--mono)">alantian@sakana.ai</span> &nbsp;/&nbsp; <span style="font-family:var(--mono)">@alanyttian</span><br>
+  ALIFE 2026: The 2026 Conference on Artificial Life</div>
+  <div class="prompt-line"><span class="typed">goal&nbsp;=&nbsp;"grow population stably"</span><span class="caret">▌</span></div>
+</section>
+
+<!-- 2 ================================================================ -->
+<section class="slide" data-sec="teal">
+  <div class="eyebrow">01 / The pitch</div>
+  <h1 class="a-rise">What if we could ask for a better world, <span class="accent">in plain language?</span></h1>
+  <div class="cols" style="gap:34px">
+    <div class="col" style="flex:1.02;display:flex;flex-direction:column">
+      <p style="margin-bottom:12px" class="a-rise d1"><i>World Dynamics</i> (Forrester, 1971): a classic hand-designed model of population, resources, and pollution. Now just ask:</p>
+      <div class="goalbox">Balance population, resources, and environment by optimizing to (1)&nbsp;<span class="gv" data-v="1">maximize population growth</span>, (2)&nbsp;<span class="gv" data-v="2">minimize the resource depletion rate</span>, and (3)&nbsp;<span class="gv" data-v="3">minimize the pollution accumulation rate</span>. Seek the best trade-off where the population grows sustainably...</div>
+      <ul style="margin-top:16px" class="stagger">
+        <li style="animation-delay:4.8s" class="small">No equations to derive. No DYNAMO or STELLA to learn. No manual trial-and-error.</li>
+        <li style="animation-delay:5.2s" class="small"><b>CEDAR takes this sentence and autonomously evolves the system</b>: ~30 minutes, $10–$50 per run.</li>
+      </ul>
+      <div class="kicker a-rise" style="margin-top:auto;font-size:19px;animation-delay:5.6s">This talk: how LLM agents + tree search make that work, and what it offers artificial life.</div>
+    </div>
+    <div class="col a-rise d2" style="flex:0.98">
+      <div class="dyncard">
+        <pre><span class="dl" data-i="0">       <span class="dl-cm"> *       WORLD DYNAMICS W5</span></span>
+<span class="dl" data-i="1"></span>
+<span class="dl" id="dv1" data-i="2"><span class="dl-num">1</span>       <span class="dl-kw">L</span>       P.K = P.J + (DT)*(BR.JK - DR.JK)</span>
+<span class="dl" data-i="3"><span class="dl-num">1.1</span>     <span class="dl-kw">N</span>       P = PI</span>
+<span class="dl" data-i="4"><span class="dl-num">1.2</span>     <span class="dl-kw">C</span>       PI = 1.65E9</span>
+<span class="dl" data-i="5"></span>
+<span class="dl" data-i="6"><span class="dl-num">2</span>       <span class="dl-kw">R</span>       BR.KL = P.K * <span class="dl-fn">CLIP</span>(BRN, BRN1, SWT1, TIME.K) * BRFM.K * BRMM.K * BRCM.K * BRPM.K</span>
+<span class="dl" data-i="7"><span class="dl-num">2.2</span>     <span class="dl-kw">C</span>       BRN = 0.04</span>
+<span class="dl" data-i="8"><span class="dl-num">2.3</span>     <span class="dl-kw">C</span>       BRN1 = 0.04</span>
+<span class="dl" data-i="9"><span class="dl-num">2.4</span>     <span class="dl-kw">C</span>       SWT1 = 1970</span>
+<span class="dl" data-i="10"></span>
+<span class="dl" data-i="11"><span class="dl-num">3</span>       <span class="dl-kw">A</span>       BRMM.K = <span class="dl-fn">TABHL</span>(BRMMT, MSL.K, 0, 5, 1)</span>
+<span class="dl" data-i="12"><span class="dl-num">3.1</span>     <span class="dl-kw">T</span>       BRMMT = 1.2 / 1 / 0.85 / 0.75 / 0.7 / 0.7</span>
+<span class="dl" data-i="13"></span>
+<span class="dl" data-i="14"><span class="dl-num">4</span>       <span class="dl-kw">A</span>       MSL.K = ECIR.K / ECIRN</span>
+<span class="dl" data-i="15"><span class="dl-num">4.1</span>     <span class="dl-kw">C</span>       ECIRN = 1</span>
+<span class="dl" data-i="16"></span>
+<span class="dl" data-i="17"><span class="dl-num">5</span>       <span class="dl-kw">A</span>       ECIR.K = CIR.K * (1 - CIAF.K) * NREM.K / (1 - CIAFN)</span>
+<span class="dl" data-i="18"></span>
+<span class="dl" data-i="19"><span class="dl-num">6</span>       <span class="dl-kw">A</span>       NREM.K = <span class="dl-fn">TABLE</span>(NREMT, NRFR.K, 0, 1, 0.25)</span>
+<span class="dl" data-i="20"><span class="dl-num">6.1</span>     <span class="dl-kw">T</span>       NREMT = 0 / 0.15 / 0.5 / 0.85 / 1</span>
+<span class="dl" data-i="21"></span>
+<span class="dl" data-i="22"><span class="dl-num">7</span>       <span class="dl-kw">A</span>       NRFR.K = NR.K / NRI</span>
+<span class="dl" data-i="23"></span>
+<span class="dl" id="dv2" data-i="24"><span class="dl-num">8</span>       <span class="dl-kw">L</span>       NR.K = NR.J + (DT)*(-NRUR.JK)</span>
+<span class="dl" data-i="25"><span class="dl-num">8.1</span>     <span class="dl-kw">N</span>       NR = NRI</span>
+<span class="dl" data-i="26"><span class="dl-num">8.2</span>     <span class="dl-kw">C</span>       NRI = 900E9</span>
+<span class="dl" data-i="27"></span>
+<span class="dl" data-i="28"><span class="dl-num">9</span>       <span class="dl-kw">R</span>       NRUR.KL = P.K * <span class="dl-fn">CLIP</span>(NRUN, NRUN1, SWT2, TIME.K) * NRMM.K</span>
+<span class="dl" data-i="29"><span class="dl-num">9.1</span>     <span class="dl-kw">C</span>       NRUN = 1</span>
+<span class="dl" data-i="30"><span class="dl-num">9.2</span>     <span class="dl-kw">C</span>       NRUN1 = 1</span>
+<span class="dl" data-i="31"><span class="dl-num">9.3</span>     <span class="dl-kw">C</span>       SWT2 = 1970</span>
+<span class="dl" data-i="32"></span>
+<span class="dl" data-i="33">       <span class="dl-cm"> NOTE    EQUATION 42 CONNECTS HERE FROM EQ. 4 TO EQ. 9</span></span>
+<span class="dl" data-i="34"></span>
+<span class="dl" data-i="35"><span class="dl-num">10</span>      <span class="dl-kw">R</span>       DR.KL = P.K * <span class="dl-fn">CLIP</span>(DRN, DRN1, SWT3, TIME.K) * DRMM.K * DRPM.K * DRFM.K * DRCM.K</span>
+<span class="dl" data-i="36"><span class="dl-num">10.2</span>    <span class="dl-kw">C</span>       DRN = 0.028</span>
+<span class="dl" data-i="37"><span class="dl-num">10.3</span>    <span class="dl-kw">C</span>       DRN1 = 0.028</span>
+<span class="dl" data-i="38"><span class="dl-num">10.4</span>    <span class="dl-kw">C</span>       SWT3 = 1970</span>
+<span class="dl" data-i="39"></span>
+<span class="dl" data-i="40"><span class="dl-num">11</span>      <span class="dl-kw">A</span>       DRMM.K = <span class="dl-fn">TABHL</span>(DRMMT, MSL.K, 0, 5, 0.5)</span>
+<span class="dl" data-i="41"><span class="dl-num">11.1</span>    <span class="dl-kw">T</span>       DRMMT = 3 / 1.8 / 1 / 0.8 / 0.7 / 0.6 / 0.53 / 0.5 / 0.5 / 0.5 / 0.5</span>
+<span class="dl" data-i="42"></span>
+<span class="dl" data-i="43"><span class="dl-num">12</span>      <span class="dl-kw">A</span>       DRPM.K = <span class="dl-fn">TABLE</span>(DRPMT, POLR.K, 0, 60, 10)</span>
+<span class="dl" data-i="44"><span class="dl-num">12.1</span>    <span class="dl-kw">T</span>       DRPMT = 0.92 / 1.3 / 2 / 3.2 / 4.8 / 6.8 / 9.2</span>
+<span class="dl" data-i="45"></span>
+<span class="dl" data-i="46"><span class="dl-num">13</span>      <span class="dl-kw">A</span>       DRFM.K = <span class="dl-fn">TABHL</span>(DRFMT, FR.K, 0, 2, 0.25)</span>
+<span class="dl" data-i="47"><span class="dl-num">13.1</span>    <span class="dl-kw">T</span>       DRFMT = 30 / 3 / 2 / 1.4 / 1 / 0.7 / 0.6 / 0.5 / 0.5</span>
+<span class="dl" data-i="48"></span>
+<span class="dl" data-i="49"><span class="dl-num">14</span>      <span class="dl-kw">A</span>       DRCM.K = <span class="dl-fn">TABLE</span>(DRCMT, CR.K, 0, 5, 1)</span>
+<span class="dl" data-i="50"><span class="dl-num">14.1</span>    <span class="dl-kw">T</span>       DRCMT = 0.9 / 1 / 1.2 / 1.5 / 1.9 / 3</span>
+<span class="dl" data-i="51"></span>
+<span class="dl" data-i="52"><span class="dl-num">15</span>      <span class="dl-kw">A</span>       CR.K = P.K / (LA * PDN)</span>
+<span class="dl" data-i="53"><span class="dl-num">15.1</span>    <span class="dl-kw">C</span>       LA = 135E6</span>
+<span class="dl" data-i="54"><span class="dl-num">15.2</span>    <span class="dl-kw">C</span>       PDN = 26.5</span>
+<span class="dl" data-i="55"></span>
+<span class="dl" data-i="56"><span class="dl-num">16</span>      <span class="dl-kw">A</span>       BRCM.K = <span class="dl-fn">TABLE</span>(BRCMT, CR.K, 0, 5, 1)</span>
+<span class="dl" data-i="57"><span class="dl-num">16.1</span>    <span class="dl-kw">T</span>       BRCMT = 1.05 / 1 / 0.9 / 0.7 / 0.6 / 0.55</span>
+<span class="dl" data-i="58"></span>
+<span class="dl" data-i="59"><span class="dl-num">17</span>      <span class="dl-kw">A</span>       BRFM.K = <span class="dl-fn">TABHL</span>(BRFMT, FR.K, 0, 4, 1)</span>
+<span class="dl" data-i="60"><span class="dl-num">17.1</span>    <span class="dl-kw">T</span>       BRFMT = 0 / 1 / 1.6 / 1.9 / 2</span>
+<span class="dl" data-i="61"></span>
+<span class="dl" data-i="62"><span class="dl-num">18</span>      <span class="dl-kw">A</span>       BRPM.K = <span class="dl-fn">TABLE</span>(BRPMT, POLR.K, 0, 60, 10)</span>
+<span class="dl" data-i="63"><span class="dl-num">18.1</span>    <span class="dl-kw">T</span>       BRPMT = 1.02 / 0.9 / 0.7 / 0.4 / 0.25 / 0.15 / 0.1</span>
+<span class="dl" data-i="64"></span>
+<span class="dl" data-i="65"><span class="dl-num">19</span>      <span class="dl-kw">A</span>       FR.K = FPCI.K * FCM.K * FPM.K * <span class="dl-fn">CLIP</span>(FC, FC1, SWT7, TIME.K) / FN</span>
+<span class="dl" data-i="66"><span class="dl-num">19.1</span>    <span class="dl-kw">C</span>       FC = 1</span>
+<span class="dl" data-i="67"><span class="dl-num">19.2</span>    <span class="dl-kw">C</span>       FC1 = 1</span>
+<span class="dl" data-i="68"><span class="dl-num">19.3</span>    <span class="dl-kw">C</span>       FN = 1</span>
+<span class="dl" data-i="69"><span class="dl-num">19.4</span>    <span class="dl-kw">C</span>       SWT7 = 1970</span>
+<span class="dl" data-i="70"></span>
+<span class="dl" data-i="71"><span class="dl-num">20</span>      <span class="dl-kw">A</span>       FCM.K = <span class="dl-fn">TABLE</span>(FCMT, CR.K, 0, 5, 1)</span>
+<span class="dl" data-i="72"><span class="dl-num">20.1</span>    <span class="dl-kw">T</span>       FCMT = 2.4 / 1 / 0.6 / 0.4 / 0.3 / 0.2</span>
+<span class="dl" data-i="73"></span>
+<span class="dl" data-i="74"><span class="dl-num">21</span>      <span class="dl-kw">A</span>       FPCI.K = <span class="dl-fn">TABHL</span>(FPCIT, CIRA.K, 0, 6, 1)</span>
+<span class="dl" data-i="75"><span class="dl-num">21.1</span>    <span class="dl-kw">T</span>       FPCIT = 0.5 / 1 / 1.4 / 1.7 / 1.9 / 2.05 / 2.2</span>
+<span class="dl" data-i="76"></span>
+<span class="dl" data-i="77"><span class="dl-num">22</span>      <span class="dl-kw">A</span>       CIRA.K = CIR.K * CIAF.K / CIAFN</span>
+<span class="dl" data-i="78"><span class="dl-num">22.1</span>    <span class="dl-kw">C</span>       CIAFN = 0.3</span>
+<span class="dl" data-i="79"></span>
+<span class="dl" data-i="80"><span class="dl-num">23</span>      <span class="dl-kw">A</span>       CIR.K = CI.K / P.K</span>
+<span class="dl" data-i="81"></span>
+<span class="dl" data-i="82"><span class="dl-num">24</span>      <span class="dl-kw">L</span>       CI.K = CI.J + (DT)*(CIG.JK - CID.JK)</span>
+<span class="dl" data-i="83"><span class="dl-num">24.1</span>    <span class="dl-kw">N</span>       CI = CII</span>
+<span class="dl" data-i="84"><span class="dl-num">24.2</span>    <span class="dl-kw">C</span>       CII = 0.4E9</span>
+<span class="dl" data-i="85"></span>
+<span class="dl" data-i="86"><span class="dl-num">25</span>      <span class="dl-kw">R</span>       CIG.KL = P.K * CIM.K * <span class="dl-fn">CLIP</span>(CIGN, CIGN1, SWT4, TIME.K)</span>
+<span class="dl" data-i="87"><span class="dl-num">25.1</span>    <span class="dl-kw">C</span>       CIGN = 0.05</span>
+<span class="dl" data-i="88"><span class="dl-num">25.2</span>    <span class="dl-kw">C</span>       CIGN1 = 0.05</span>
+<span class="dl" data-i="89"><span class="dl-num">25.3</span>    <span class="dl-kw">C</span>       SWT4 = 1970</span>
+<span class="dl" data-i="90"></span>
+<span class="dl" data-i="91"><span class="dl-num">26</span>      <span class="dl-kw">A</span>       CIM.K = <span class="dl-fn">TABHL</span>(CIMT, MSL.K, 0, 5, 1)</span>
+<span class="dl" data-i="92"><span class="dl-num">26.1</span>    <span class="dl-kw">T</span>       CIMT = 0.1 / 1.0 / 1.8 / 2.4 / 2.8 / 3</span>
+<span class="dl" data-i="93"></span>
+<span class="dl" data-i="94"><span class="dl-num">27</span>      <span class="dl-kw">R</span>       CID.KL = CI.K * <span class="dl-fn">CLIP</span>(CIDN, CIDN1, SWT5, TIME.K)</span>
+<span class="dl" data-i="95"><span class="dl-num">27.1</span>    <span class="dl-kw">C</span>       CIDN = 0.025</span>
+<span class="dl" data-i="96"><span class="dl-num">27.2</span>    <span class="dl-kw">C</span>       CIDN1 = 0.025</span>
+<span class="dl" data-i="97"><span class="dl-num">27.3</span>    <span class="dl-kw">C</span>       SWT5 = 1970</span>
+<span class="dl" data-i="98"></span>
+<span class="dl" data-i="99"><span class="dl-num">28</span>      <span class="dl-kw">A</span>       FPM.K = <span class="dl-fn">TABLE</span>(FPMT, POLR.K, 0, 60, 10)</span>
+<span class="dl" data-i="100"><span class="dl-num">28.1</span>    <span class="dl-kw">T</span>       FPMT = 1.02 / 0.9 / 0.65 / 0.35 / 0.2 / 0.1 / 0.05</span>
+<span class="dl" data-i="101"></span>
+<span class="dl" data-i="102"><span class="dl-num">29</span>      <span class="dl-kw">A</span>       POLR.K = POL.K / POLS</span>
+<span class="dl" data-i="103"><span class="dl-num">29.1</span>    <span class="dl-kw">C</span>       POLS = 3.6E9</span>
+<span class="dl" data-i="104"></span>
+<span class="dl" id="dv3" data-i="105"><span class="dl-num">30</span>      <span class="dl-kw">L</span>       POL.K = POL.J + (DT)*(POLG.JK - POLA.JK)</span>
+<span class="dl" data-i="106"><span class="dl-num">30.1</span>    <span class="dl-kw">N</span>       POL = POLI</span>
+<span class="dl" data-i="107"><span class="dl-num">30.2</span>    <span class="dl-kw">C</span>       POLI = 0.2E9</span>
+<span class="dl" data-i="108"></span>
+<span class="dl" data-i="109"><span class="dl-num">31</span>      <span class="dl-kw">R</span>       POLG.KL = P.K * <span class="dl-fn">CLIP</span>(POLN, POLN1, SWT6, TIME.K) * POLCM.K</span>
+<span class="dl" data-i="110"><span class="dl-num">31.1</span>    <span class="dl-kw">C</span>       POLN = 1</span>
+<span class="dl" data-i="111"><span class="dl-num">31.2</span>    <span class="dl-kw">C</span>       POLN1 = 1</span>
+<span class="dl" data-i="112"><span class="dl-num">31.3</span>    <span class="dl-kw">C</span>       SWT6 = 1970</span>
+<span class="dl" data-i="113"></span>
+<span class="dl" data-i="114"><span class="dl-num">32</span>      <span class="dl-kw">A</span>       POLCM.K = <span class="dl-fn">TABHL</span>(POLCMT, CIR.K, 0, 5, 1)</span>
+<span class="dl" data-i="115"><span class="dl-num">32.1</span>    <span class="dl-kw">T</span>       POLCMT = 0.05 / 1 / 3 / 5.4 / 7.4 / 8</span>
+<span class="dl" data-i="116"></span>
+<span class="dl" data-i="117"><span class="dl-num">33</span>      <span class="dl-kw">R</span>       POLA.KL = POL.K / POLAT.K</span>
+<span class="dl" data-i="118"></span>
+<span class="dl" data-i="119"><span class="dl-num">34</span>      <span class="dl-kw">A</span>       POLAT.K = <span class="dl-fn">TABLE</span>(POLATT, POLR.K, 0, 60, 10)</span>
+<span class="dl" data-i="120"><span class="dl-num">34.1</span>    <span class="dl-kw">T</span>       POLATT = 0.6 / 2.5 / 5 / 8 / 11.5 / 15.5 / 20</span>
+<span class="dl" data-i="121"></span>
+<span class="dl" data-i="122"><span class="dl-num">35</span>      <span class="dl-kw">L</span>       CIAF.K = CIAF.J + (DT/CIAFT)*(CFIFR.J * CIQR.J - CIAF.J)</span>
+<span class="dl" data-i="123"><span class="dl-num">35.1</span>    <span class="dl-kw">N</span>       CIAF = CIAFI</span>
+<span class="dl" data-i="124"><span class="dl-num">35.2</span>    <span class="dl-kw">C</span>       CIAFI = 0.2</span>
+<span class="dl" data-i="125"><span class="dl-num">35.3</span>    <span class="dl-kw">C</span>       CIAFT = 15</span>
+<span class="dl" data-i="126"></span>
+<span class="dl" data-i="127"><span class="dl-num">36</span>      <span class="dl-kw">A</span>       CFIFR.K = <span class="dl-fn">TABHL</span>(CFIFRT, FR.K, 0, 2, 0.5)</span>
+<span class="dl" data-i="128"><span class="dl-num">36.1</span>    <span class="dl-kw">T</span>       CFIFRT = 1 / 0.6 / 0.3 / 0.15 / 0.1</span>
+<span class="dl" data-i="129"></span>
+<span class="dl" data-i="130"><span class="dl-num">37</span>      <span class="dl-kw">A</span>       QL.K = QLS * QLM.K * QLC.K * QLF.K * QLP.K</span>
+<span class="dl" data-i="131"><span class="dl-num">37.1</span>    <span class="dl-kw">C</span>       QLS = 1</span>
+<span class="dl" data-i="132"></span>
+<span class="dl" data-i="133"><span class="dl-num">38</span>      <span class="dl-kw">A</span>       QLM.K = <span class="dl-fn">TABHL</span>(QLMT, MSL.K, 0, 5, 1)</span>
+<span class="dl" data-i="134"><span class="dl-num">38.1</span>    <span class="dl-kw">T</span>       QLMT = 0.2 / 1 / 1.7 / 2.3 / 2.7 / 2.9</span>
+<span class="dl" data-i="135"></span>
+<span class="dl" data-i="136"><span class="dl-num">39</span>      <span class="dl-kw">A</span>       QLC.K = <span class="dl-fn">TABLE</span>(QLCT, CR.K, 0, 5, 0.5)</span>
+<span class="dl" data-i="137"><span class="dl-num">39.1</span>    <span class="dl-kw">T</span>       QLCT = 2 / 1.3 / 1 / 0.75 / 0.55 / 0.45 / 0.38 / 0.3 / 0.25 / 0.22 / 0.2</span>
+<span class="dl" data-i="138"></span>
+<span class="dl" data-i="139"><span class="dl-num">40</span>      <span class="dl-kw">A</span>       QLF.K = <span class="dl-fn">TABHL</span>(QLFT, FR.K, 0, 4, 1)</span>
+<span class="dl" data-i="140"><span class="dl-num">40.1</span>    <span class="dl-kw">T</span>       QLFT = 0 / 1 / 1.8 / 2.4 / 2.7</span>
+<span class="dl" data-i="141"></span>
+<span class="dl" data-i="142"><span class="dl-num">41</span>      <span class="dl-kw">A</span>       QLP.K = <span class="dl-fn">TABLE</span>(QLPT, POLR.K, 0, 60, 10)</span>
+<span class="dl" data-i="143"><span class="dl-num">41.1</span>    <span class="dl-kw">T</span>       QLPT = 1.04 / 0.85 / 0.6 / 0.3 / 0.15 / 0.05 / 0.02</span>
+<span class="dl" data-i="144"></span>
+<span class="dl" data-i="145"></span>
+<span class="dl" data-i="146">       <span class="dl-cm"> NOTE    EQUATION 42 LOCATED BETWEEN EQ. 4 AND 9.</span></span>
+<span class="dl" data-i="147"></span>
+<span class="dl" data-i="148"><span class="dl-num">42</span>      <span class="dl-kw">A</span>       NRMM.K = <span class="dl-fn">TABHL</span>(NRMMT, MSL.K, 0, 10, 1)</span>
+<span class="dl" data-i="149"><span class="dl-num">42.1</span>    <span class="dl-kw">T</span>       NRMMT = 0 / 1 / 1.8 / 2.4 / 2.9 / 3.3 / 3.6 / 3.8 / 3.9 / 3.95 / 4</span>
+<span class="dl" data-i="150"></span>
+<span class="dl" data-i="151">       <span class="dl-cm"> NOTE    INPUT FROM EQN. 38 AND 40 TO EQN. 35</span></span>
+<span class="dl" data-i="152"></span>
+<span class="dl" data-i="153"><span class="dl-num">43</span>      <span class="dl-kw">A</span>       CIQR.K = <span class="dl-fn">TABHL</span>(CIQRT, QLM.K / QLF.K, 0, 2, 0.5)</span>
+<span class="dl" data-i="154"><span class="dl-num">43.1</span>    <span class="dl-kw">T</span>       CIQRT = 0.7 / 0.8 / 1 / 1.5 / 2</span>
+<span class="dl" data-i="155"></span>
+<span class="dl" data-i="156"><span class="dl-num">43.5</span>    <span class="dl-kw">C</span>       DT = 0.2</span>
+<span class="dl" data-i="157"><span class="dl-num">43.6</span>    <span class="dl-kw">C</span>       LENGTH = 2100</span>
+<span class="dl" data-i="158"><span class="dl-num">43.7</span>    <span class="dl-kw">N</span>       TIME = 1900</span>
+<span class="dl" data-i="159"></span>
+<span class="dl" data-i="160">       <span class="dl-cm"> NOTE</span></span>
+<span class="dl" data-i="161">       <span class="dl-cm"> NOTE    CONTROL CARDS</span></span>
+<span class="dl" data-i="162">       <span class="dl-cm"> NOTE</span></span>
+<span class="dl" data-i="163"></span>
+<span class="dl" data-i="164"><span class="dl-num">44</span>      <span class="dl-kw">A</span>       PRTPER.K = <span class="dl-fn">CLIP</span>(PRTP1, PRTP2, PRSWT, TIME.K)</span>
+<span class="dl" data-i="165"><span class="dl-num">44.1</span>    <span class="dl-kw">C</span>       PRTP1 = 0</span>
+<span class="dl" data-i="166"><span class="dl-num">44.2</span>    <span class="dl-kw">C</span>       PRTP2 = 0</span>
+<span class="dl" data-i="167"><span class="dl-num">44.3</span>    <span class="dl-kw">C</span>       PRSWT = 0</span>
+<span class="dl" data-i="168"></span>
+<span class="dl" data-i="169"><span class="dl-num">45</span>      <span class="dl-kw">A</span>       PLTPER.K = <span class="dl-fn">CLIP</span>(PLTP1, PLTP2, PLSWT, TIME.K)</span>
+<span class="dl" data-i="170"><span class="dl-num">45.1</span>    <span class="dl-kw">C</span>       PLTP1 = 4</span>
+<span class="dl" data-i="171"><span class="dl-num">45.2</span>    <span class="dl-kw">C</span>       PLTP2 = 4</span>
+<span class="dl" data-i="172"><span class="dl-num">45.3</span>    <span class="dl-kw">C</span>       PLSWT = 0</span>
+<span class="dl" data-i="173"></span>
+<span class="dl" data-i="174">       <span class="dl-num"></span> <span class="dl-kw">PLOT</span>    P=P(0,8E9)/POLR=2(0,40)/CI=C(0,20E9)/QL=Q(0,2)/NR=N(0,1000E9)</span>
+<span class="dl" data-i="175">       <span class="dl-num"></span> <span class="dl-kw">PLOT</span>    FR=F,MSL=M,QLC=4,QLP=5(0,2)/C1AF=A(.2,.6)</span>
+<span class="dl" data-i="176">       <span class="dl-num"></span> <span class="dl-kw">RUN</span>     ORIG</span></pre>
+      </div>
+      <p class="tiny soft" style="margin-top:6px;text-align:center">The established alternative: the same model as 178 lines of DYNAMO (Forrester, 1971).</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 ================================================================ -->
+<section class="slide" data-sec="teal">
+  <div class="eyebrow">02 / Background</div>
+  <h1 class="a-rise">Complex systems: where feedback creates <span class="accent">emergence</span></h1>
+  <div style="margin:auto 0">
+  <div class="cols" style="flex:0 0 auto">
+    <div class="col a-rise d1">
+      <ul>
+        <li>Nonlinear, feedback-driven models: global behavior <i>emerges</i> from component interactions</li>
+        <li>Core objects of study in artificial life; used across biology, epidemics, economics, policy</li>
+        <li>States are <i>meaningful stocks</i>: populations, resources, pollution; not hidden units</li>
+      </ul>
+    </div>
+    <div class="col a-rise d2" style="flex:0.8">
+      <div class="imgcard" style="border-left:4px solid var(--teal)">
+        <p class="small" style="padding:8px"><b>The catch.</b> Predicting how feedback structure produces emergent behavior is a <i>central open problem</i> in ALife.<br><br>
+        So <i>designing</i> a system to exhibit a target emergent behavior is exceptionally hard.</p>
+      </div>
+    </div>
+  </div>
+  <div class="formula a-rise d3" style="text-align:center;margin-top:30px"><img src="images/f-euler-arrow.svg" alt="dx/dt = f(x, t); Euler discretization: x(t+dt) = x(t) + dt * f(x(t), t)" style="height:42px"></div>
+  </div>
+</section>
+
+<!-- 4 ================================================================ -->
+<section class="slide" data-sec="teal">
+  <div class="eyebrow">03 / The problem</div>
+  <h1 class="a-rise">The bottleneck is double: unpredictable emergence, <span class="accent">laborious tools</span></h1>
+  <div class="cols stagger" style="flex:0 0 auto;margin:auto 0">
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:10px">Science bottleneck</p>
+      <ul>
+        <li>Structure → behavior is opaque</li>
+        <li>Goal-directed design = inverting an opaque map</li>
+      </ul>
+    </div>
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:10px">Tooling bottleneck</p>
+      <ul>
+        <li>Specialized languages: DYNAMO (1960s), STELLA (proprietary, visual)</li>
+        <li>Labor-intensive workflows; feedback relationships navigated by hand</li>
+        <li>Limits adoption exactly where insight is needed most</li>
+      </ul>
+    </div>
+  </div>
+  <div class="kicker a-rise d3" style="margin-top:0">Opportunity: LLM agents are strong at code, planning, and reasoning; MCTS gives their search structure.</div>
+</section>
+
+<!-- 5 ================================================================ -->
+<section class="slide" data-sec="orange">
+  <div class="eyebrow">04 / Method</div>
+  <h1 class="a-rise">CEDAR in <span class="accent">one picture</span></h1>
+  <figure>
+    <div class="fig">
+      <img src="images/mcts-diagram.png" style="max-height:440px" alt="CEDAR architecture: goal and system feed an MCTS loop with LLM Editor and Judge">
+      <div class="cover frag" data-o="1" style="left:15.8%;top:0;width:34.2%;height:67%"></div>
+      <div class="cover frag" data-o="2" style="left:49.4%;top:0;width:18%;height:67%"></div>
+      <div class="cover frag" data-o="2" style="left:66.7%;top:0;width:33.3%;height:67%"></div>
+      <div class="cover frag" data-o="3" style="left:0;top:66.5%;width:100%;height:33.5%"></div>
+    </div>
+    <figcaption>
+      <span>A goal + an initial system in <i>restricted Python</i>.</span>
+      <span class="frag" data-o="1">The MCTS tree grows step by step.</span>
+      <span class="frag" data-o="2">Each step: <b>select</b> a node &amp; strategy, <b>expand</b> with the LLM Editor, <b>run</b>, <b>judge</b>.</span>
+      <span class="frag" data-o="3">Each node keeps its system, record, score, and written analysis.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- 6 ================================================================ -->
+<section class="slide" data-sec="orange">
+  <div class="eyebrow">05 / Method: move 1</div>
+  <h1 class="a-rise">Represent systems as <span class="accent">runnable Python</span>, not a DSL</h1>
+  <figure>
+    <div class="fig">
+      <img src="images/code-example.png" style="max-height:270px" alt="Graph, Python code, and computation table of a population model">
+      <div class="cover frag" data-o="1" style="left:26.3%;top:0;width:35.8%;height:100%"></div>
+      <div class="cover frag" data-o="2" style="left:62.1%;top:0;width:37.9%;height:100%"></div>
+    </div>
+    <figcaption>
+      <span>Feedback structure as a graph...</span>
+      <span class="frag" data-o="1">...is the same object as plain Python with domain primitives...</span>
+      <span class="frag" data-o="2">...whose run traces every variable at every step.</span>
+    </figcaption>
+  </figure>
+  <div class="cols" style="flex:0 0 auto;margin-top:14px">
+    <div class="col"><ul>
+      <li>One representation unifies DYNAMO and STELLA models</li>
+      <li>Restricted subset + domain primitives + inline docs</li>
+    </ul></div>
+    <div class="col"><ul>
+      <li>LLMs already speak Python fluently</li>
+      <li>Editing code = editing <i>dynamics</i>: variables, feedback links, equations</li>
+    </ul></div>
+  </div>
+  <p class="small" style="margin-top:6px"><b>Holds all 20 classical systems we study</b>: <i>World Dynamics</i> + 19 from <i>Modeling Dynamic Biological Systems</i> (20–69 integrated variables each).</p>
+</section>
+
+<!-- 7 ================================================================ -->
+<section class="slide" data-sec="orange">
+  <div class="eyebrow">06 / Method: move 2</div>
+  <h1 class="a-rise">LLM <span class="accent">Judge as fitness</span>, LLM <span class="accent">Editor as variation</span></h1>
+  <figure>
+    <div class="fig">
+      <img src="images/llm-expand-pipeline.png" style="max-height:345px" alt="Node expansion: Editor updates the system, it runs, Judge scores and analyzes">
+      <div class="cover frag" data-o="1" style="left:24.4%;top:0;width:5.5%;height:100%"></div>
+      <div class="cover frag" data-o="1" style="left:29.7%;top:45.5%;width:43.6%;height:54.5%"></div>
+      <div class="cover frag" data-o="2" style="left:73.2%;top:0;width:26.8%;height:100%"></div>
+    </div>
+  </figure>
+  <div style="display:flex;gap:32px;margin-top:14px">
+    <p class="small" style="flex:1.15"><b>Editor</b> (variation operator): structural edits (add/remove state variables, rewire feedback, rewrite equations), guided by strategy, goal, and the parent's analysis.</p>
+    <p class="small frag" data-o="1" style="flex:1.05"><b>①→② the Editor writes a new system; running it</b> produces a fresh execution record.</p>
+    <p class="small frag" data-o="2" style="flex:1.1"><b>Judge</b> (fitness function): reads the record; returns a bounded score <i>and</i> an analysis that feeds the next edit. A generate-and-evaluate loop, in the spirit of evolutionary computation.</p>
+  </div>
+</section>
+
+<!-- 8 ================================================================ -->
+<section class="slide" data-sec="orange">
+  <div class="eyebrow">07 / Method: move 3</div>
+  <h1 class="a-rise">The search tree is a <span class="accent">structured population</span></h1>
+  <div class="cols" style="flex:0 0 auto;margin:auto 0">
+    <div class="col a-rise d1" style="flex:1.3">
+      <p style="font-weight:650;margin-bottom:8px">Generalized UCT selection</p>
+      <div class="formula" style="text-align:center"><img src="images/f-uct.svg" alt="Score(v) = S_v + alpha * sqrt(ln(c_p+1)/(c_v+1)) * I[c_v &lt; tau] + gamma * Depth(v)" style="height:54px;max-width:100%"></div>
+      <ul class="small" style="margin-top:14px">
+        <li>exploration (<img src="images/sym-alpha.svg" alt="alpha" style="height:12px">) + depth bonus (<img src="images/sym-gamma.svg" alt="gamma" style="height:15px;vertical-align:-4px">) + progressive widening (<img src="images/sym-tau.svg" alt="tau" style="height:11px">)</li>
+        <li>nodes re-expandable until <img src="images/expr-cvtau.svg" alt="c_v &gt;= tau" style="height:15px;vertical-align:-3px">, unlike vanilla MCTS</li>
+        <li>formally a principled MCTS variant: Editor = stochastic transition kernel, Judge = noisy value function</li>
+      </ul>
+    </div>
+    <div class="col">
+      <p class="a-rise d2" style="font-weight:650;margin-bottom:8px">8 expansion strategies, sampled uniformly</p>
+      <p class="small stagger fast" style="font-family:var(--mono)"><span>breakthrough / </span><span>aggressive / </span><span>amplify / </span><span>exploratory / </span><span>targeted / </span><span>contrarian / </span><span>balanced / </span><span>conservative</span></p>
+      <p class="a-rise d3" style="font-weight:650;margin:22px 0 8px">In our runs</p>
+      <p class="small a-rise d3" style="font-family:var(--mono)">backends: Claude Sonnet 4.5 / GPT-5.1<br>20 selections × 5 candidates<br>&nbsp;&nbsp;= 100 expansions per search<br><img src="images/expr-a1g2.svg" alt="alpha = 1, gamma = 2" style="height:16px;vertical-align:-4px"></p>
+    </div>
+  </div>
+  <div class="kicker a-rise d4" style="color:var(--orange);margin-top:0">Branching keeps many good, different systems alive at once: selection pressure without collapse. Ablation: MCTS beats linear search (higher scores, smoother search trajectories).</div>
+</section>
+
+<!-- 9 ================================================================ -->
+<section class="slide" data-sec="purple">
+  <div class="eyebrow">08 / Results: abstract goal</div>
+  <h1 class="a-rise">The goal is self-conflicting: pushing one objective <span class="accent">breaks the others</span></h1>
+  <div class="cols">
+    <div class="col" style="flex:0.85;align-self:stretch;display:flex;flex-direction:column">
+      <ul>
+        <li><i>World Dynamics</i> already sits near a Pareto frontier</li>
+        <li class="frag" data-o="1">Maximize population <i>only</i> (magenta) ⇒ resources crash, pollution explodes</li>
+        <li class="frag" data-o="2">Minimize depletion <i>only</i> (orange) ⇒ population stagnates</li>
+      </ul>
+      <div class="kicker frag" data-o="3" style="color:var(--purple)">Joint improvement of all three subgoals is the real test.</div>
+    </div>
+    <div class="col"><figure>
+      <div class="fig">
+        <img src="images/fitting-single-goal.png" style="max-height:460px" alt="Single-objective optimization: each subgoal alone damages the others">
+        <div class="cover frag" data-o="1" style="left:0;top:33.6%;width:100%;height:33.2%"></div>
+        <div class="cover frag" data-o="2" style="left:0;top:66.4%;width:100%;height:33.6%"></div>
+      </div>
+    </figure></div>
+  </div>
+</section>
+
+<!-- 10 ================================================================ -->
+<section class="slide" data-sec="purple">
+  <div class="eyebrow">09 / Results: abstract goal</div>
+  <h1 style="margin-bottom:16px" class="a-rise">CEDAR finds sustainable worlds: <span class="accent">a different one per LLM</span></h1>
+  <div class="cols" style="flex:0 0 auto;gap:56px;justify-content:center">
+    <div class="col" style="flex:0 0 auto"><figure>
+      <div class="fig">
+        <img src="images/fitting-goal-tree-crop.png" style="max-height:340px" alt="MCTS search tree from baseline to optimized system, best path highlighted">
+        <div class="cover onpaper a-growy" style="left:0;top:0;width:100%;height:100%"></div>
+      </div>
+    </figure></div>
+    <div class="col" style="flex:0 0 auto"><figure>
+      <div class="fig">
+        <img src="images/fitting-goal-traj-crop.png" style="max-height:340px" alt="Optimized population, resources, and pollution trajectories versus the baseline system">
+        <div class="cover onpaper a-drawx d2" style="left:0;top:0;width:100%;height:100%"></div>
+      </div>
+    </figure></div>
+  </div>
+  <ul class="small stagger late" style="margin:12px auto 0">
+    <li style="margin-bottom:4px">The tree (left) steers toward higher Judge scores; best path highlighted</li>
+    <li style="margin-bottom:4px">Optimized systems (right): population ↑, resources ↑, pollution ↓, <b>all three jointly</b></li>
+    <li style="margin-bottom:0"><b>Claude</b> and <b>GPT-5.1</b> discover <i>structurally distinct</i> trade-offs (population-first vs. resource-first)</li>
+  </ul>
+  <div class="kicker a-rise d5" style="color:var(--purple)">One vague sentence in, a portfolio of qualitatively different sustainable systems out.</div>
+</section>
+
+<!-- 11 ================================================================ -->
+<section class="slide" data-sec="purple">
+  <div class="eyebrow">10 / Results: record fitting</div>
+  <h1 class="a-rise">CEDAR with <span class="accent">no formulae</span> beats Optuna with the <span class="accent">full formulae</span></h1>
+  <p class="small a-rise d1" style="margin-bottom:16px"><b>Task:</b> fit the record of a <i>stochastic</i> population model, starting from a bare skeleton. Optuna gets 100 trials and up to the <i>full ground-truth equations</i>: strictly more prior structure than CEDAR.</p>
+  <div class="cols">
+    <div class="col">
+      <table>
+        <thead><tr><th>Method</th><th>Formulae</th><th style="text-align:right">L1 ↓</th><th style="text-align:right">DTW ↓</th></tr></thead>
+        <tbody class="stagger">
+          <tr style="color:#006666"><td>Optuna</td><td>none</td><td class="num">29.06</td><td class="num">5503.68</td></tr>
+          <tr style="color:#AA3366"><td>Optuna</td><td>simple</td><td class="num">26.01</td><td class="num">4927.94</td></tr>
+          <tr style="color:#5533AA"><td>Optuna</td><td><b>full</b></td><td class="num">3.71</td><td class="num">477.52</td></tr>
+          <tr style="color:#CC4400"><td>CEDAR (Claude)</td><td>none</td><td class="num">3.29</td><td class="num">757.21</td></tr>
+          <tr class="hl-auto" style="color:#00AA44"><td>CEDAR (GPT-5.1)</td><td>none</td><td class="num"><b>2.22</b></td><td class="num"><b>433.13</b></td></tr>
+        </tbody>
+      </table>
+      <p class="tiny soft a-rise d3" style="margin-top:12px">Without formulae, Optuna collapses to near-constant populations; CEDAR tracks the peaks and dips within ground-truth variability.<br>Vs. Optuna (full): Claude wins on L1 only; GPT-5.1 wins on both metrics.</p>
+    </div>
+    <div class="col"><figure>
+      <div class="fig">
+        <img src="images/fitting_comparison.png" style="max-height:360px" alt="Population trajectories: CEDAR follows ground truth; weak baselines flatline">
+        <div class="cover a-drawx" style="left:0;top:0;width:100%;height:100%"></div>
+      </div>
+    </figure></div>
+  </div>
+</section>
+
+<!-- 12 ================================================================ -->
+<section class="slide" data-sec="purple">
+  <div class="eyebrow">11 / Results: diversity &amp; interpretability</div>
+  <h1 class="a-rise">A <span class="accent">population of explained solutions</span>, not a single point</h1>
+  <figure style="margin-top:auto">
+    <div class="fig" style="display:block">
+      <img src="images/compare_POPULATION.png" style="width:100%" alt="Distinct near-best population trajectories from one run">
+      <div class="cover a-drawx" style="left:0;top:0;width:100%;height:100%"></div>
+    </div>
+    <figcaption>Near-best nodes of <i>one</i> run: all satisfy the goal along <i>distinct</i> trajectories ⇒ sensitivity analysis for decision-making.</figcaption>
+  </figure>
+  <p class="small a-rise d3" style="font-weight:650;margin:16px 0 8px">Every step is narrated.</p>
+  <div style="display:flex;gap:24px;margin-bottom:auto">
+    <div class="quote a-rise" style="flex:1;margin-bottom:0;animation-delay:2.1s">Judge, at the root: “Unsustainable overshoot behavior - <span class="res">69% resource depletion</span>, <span class="pol">46x pollution increase</span>”</div>
+    <div class="quote a-rise" style="flex:1;margin-bottom:0;animation-delay:2.8s">Judge, at the best node: “Holy grail achievement - <span class="pop">6.4x population growth</span> with only <span class="res">19.9% resource depletion</span>”</div>
+  </div>
+</section>
+
+<!-- 13 ================================================================ -->
+<section class="slide" data-sec="magenta">
+  <div class="eyebrow">12 / Discussion</div>
+  <h1 class="a-rise">For artificial life: <span class="accent">range, access, and a record of why</span></h1>
+  <ul class="stagger" style="max-width:1050px;margin-top:auto">
+    <li style="margin-bottom:20px"><b>Open-ended exploration.</b> A branching tree preserves structurally distinct emergent behaviors, valuable when the <i>range</i> of behaviors matters, not just one optimum.</li>
+    <li style="margin-bottom:20px"><b>Accessibility.</b> Natural-language goals + Python representation lower the barrier that DYNAMO/STELLA workflows impose: complex-systems modeling for more domains, faster decisions.</li>
+    <li><b>Transparency.</b> LLM analyses document how structural edits steer emergent behavior, step by step: a new handle on the structure-to-emergence question.</li>
+  </ul>
+  <div class="kicker a-rise d3" style="color:var(--magenta)">Evolutionary search over living-system models, with agents as its operators.</div>
+</section>
+
+<!-- 14 ================================================================ -->
+<section class="slide" data-sec="magenta">
+  <div class="eyebrow">13 / Method details</div>
+  <h1 class="a-rise">One edit cascades across ~45 coupled variables: <span class="accent">design needs search</span></h1>
+  <div class="cols" style="gap:36px">
+    <div class="col a-rise d1" style="flex:0.92">
+      <figure class="imgcard" style="overflow:hidden">
+        <div style="overflow:hidden"><img src="images/dependency_graph.png" class="a-kenburns" style="max-height:360px" alt="Dependency graph of the World Dynamics system: a dense web of interconnected variables"></div>
+        <figcaption><i>World Dynamics</i> as a dependency graph: ~45 coupled variables; one edit cascades everywhere.</figcaption>
+      </figure>
+    </div>
+    <div class="col" style="flex:1.08">
+      <p class="small soft a-rise d1" style="margin-bottom:10px">More method details worth mentioning.</p>
+      <div class="formula a-rise d2" style="text-align:center"><img src="images/f-phi.svg" alt="phi(v) = alpha * sqrt(ln(c_p+1)/(c_v+1)) * I[c_v &lt; tau] + beta * I[c_v &gt;= tau] + gamma * Depth(v), with beta = -infinity" style="height:46px;max-width:100%"><div class="tiny soft" style="margin-top:6px"><img src="images/expr-betainf.svg" alt="beta = -infinity" style="height:14px;vertical-align:-3px"> enforces progressive widening</div></div>
+      <ul class="small a-rise d2" style="margin-top:12px">
+        <li>Editor: learned transition kernel <img src="images/f-kernel.svg" alt="P_u ~ P_theta(. | P_v, A_v, s, G)" style="height:20px;vertical-align:-5px"> over programs</li>
+        <li>Judge: bounded, noisy value function</li>
+      </ul>
+      <p style="font-weight:650;margin:12px 0 6px" class="small a-rise d3">Engineering for stability</p>
+      <ul class="small a-rise d3">
+        <li>Adaptive context subsampling within budget L; O(NL) total</li>
+        <li>Structured outputs, up to 3 retries per call</li>
+        <li>Crashed or NaN runs scored low, so the tree backtracks</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 15 ================================================================ -->
+<section class="slide" data-sec="magenta">
+  <div class="eyebrow">14 / Result details</div>
+  <h1 style="margin-bottom:16px" class="a-rise">The ground truth is itself volatile: <span class="accent">CEDAR fits within the seed band</span></h1>
+  <div style="display:flex;gap:24px">
+    <figure class="imgcard" style="flex:1"><div class="fig" style="display:block">
+      <img src="images/gt_seeds_statistics.png" style="max-height:212px" alt="Ground truth trajectories across 10 random seeds with variability band">
+      <div class="cover a-drawx" style="left:0;top:0;width:100%;height:100%"></div>
+    </div></figure>
+    <figure class="imgcard" style="flex:1"><div class="fig" style="display:block">
+      <img src="images/gt_seeds_comparison.png" style="max-height:212px" alt="Overlay of the 10 seed trajectories of the ground truth system">
+      <div class="cover a-drawx d2" style="left:0;top:0;width:100%;height:100%"></div>
+    </div></figure>
+  </div>
+  <p class="tiny soft a-rise" style="margin-top:8px;text-align:center;animation-delay:3.0s">10 random seeds of the ground truth: the stochastic death rate makes the volatility intrinsic, and CEDAR's fit sits within that band.</p>
+  <div class="cols" style="flex:0 0 auto;margin-top:12px;gap:44px">
+    <div class="col a-rise" style="animation-delay:3.3s">
+      <table style="font-size:16.5px">
+        <thead><tr><th>Method</th><th>Formulae</th><th style="text-align:right">L1 ↓</th><th style="text-align:right">DTW ↓</th></tr></thead>
+        <tbody>
+          <tr style="color:#5533AA"><td>Optuna (Run 1)</td><td>full</td><td class="num">3.71</td><td class="num">477.52</td></tr>
+          <tr style="color:#5533AA"><td>Optuna (Run 2)</td><td>full</td><td class="num">4.26</td><td class="num">605.05</td></tr>
+          <tr style="color:#00AA44"><td>CEDAR (GPT-5.1)</td><td>none</td><td class="num"><b>2.22</b></td><td class="num"><b>433.13</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col a-rise" style="animation-delay:3.6s">
+      <p class="small" style="margin-bottom:8px">A second full-formulae Optuna run does not close the gap: parameter fitting with the true equations still trails CEDAR (noise floor, sensitive nonlinear landscape).</p>
+      <p class="small soft">Full Judge and Editor transcripts are released; scores and reasoning align on human inspection.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 16 ================================================================ -->
+<section class="slide" data-sec="magenta">
+  <div class="eyebrow">15 / Limits &amp; next</div>
+  <h1 class="a-rise">Limits, and <span class="accent">what comes next</span></h1>
+  <div class="cols stagger" style="flex:0 0 auto;margin:auto 0">
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:10px">Limits</p>
+      <ul>
+        <li>Judge scores what a same-class LLM edited: circularity risk for abstract goals</li>
+        <li>Trends, not tight statistics; two systems studied in depth</li>
+        <li>Judge rationales make the search inspectable, not (yet) a verified causal account of emergence</li>
+        <li>Convergence guarantees for MCTS-with-LLMs: open</li>
+      </ul>
+    </div>
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:10px">Next</p>
+      <ul>
+        <li>Systematic benchmarks vs. classical evolutionary &amp; multi-objective methods</li>
+        <li>When is LLM variation/evaluation <i>necessary</i>, not merely helpful?</li>
+        <li>More systems, more domains</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 17 ================================================================ -->
+<section class="slide fishy" data-sec="magenta" style="justify-content:center;text-align:center">
+  <div class="fish-slot" aria-hidden="true"></div>
+  <div class="big2 a-rise">Ask for the behavior.<br>Let the agents <span class="accent">grow the system</span>.</div>
+  <h1 class="a-pop" style="font-size:68px;margin:44px 0 0">Questions<span class="accent">?</span></h1>
+  <p class="a-rise d3" style="margin-top:40px;font-size:19px;color:var(--ink-soft)">Yingtao Tian &nbsp;/&nbsp; Sakana AI &nbsp;/&nbsp; <span style="font-family:var(--mono)">alantian@sakana.ai</span> &nbsp;/&nbsp; <span style="font-family:var(--mono)">@alanyttian</span></p>
+  <div class="a-rise d4" style="margin-top:30px"><img src="images/sakana-logo.png" alt="Sakana AI" style="height:38px"></div>
+</section>
+
+<svg id="rail" aria-hidden="true"></svg>
+<div id="counter"></div>
+<div id="help">→ or tap right: next / ← or tap left: back / swipe / F fullscreen</div>
+</div>
+</div>
+
+<script src="js/p5.min.js"></script>
+<script src="js/sketch.js"></script>
+<script>
+(function(){
+  const stage=document.getElementById('stage');
+  const slides=[...document.querySelectorAll('.slide')];
+  const secColor={teal:'#0F6B66',orange:'#CC4400',purple:'#5533AA',magenta:'#AA3366'};
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const still=new URLSearchParams(location.search).has('still');
+  if(still)document.documentElement.classList.add('still');
+  let i=0,f=0;
+
+  function fit(){
+    const vw=window.visualViewport?visualViewport.width:innerWidth;
+    const vh=window.visualViewport?visualViewport.height:innerHeight;
+    const s=Math.min(vw/1280,vh/720)*0.98;
+    stage.style.transform=`scale(${s})`;
+  }
+  addEventListener('resize',fit);
+  if(window.visualViewport)visualViewport.addEventListener('resize',fit);
+  fit();
+
+  /* ---- fragment groups per slide (elements sharing data-o fire together) ---- */
+  const groups=slides.map(sl=>{
+    const els=[...sl.querySelectorAll('.frag')];
+    const map=new Map();
+    els.forEach((el,k)=>{
+      const key=el.dataset.o!==undefined?+el.dataset.o:1000+k;
+      if(!map.has(key))map.set(key,[]);
+      map.get(key).push(el);
+    });
+    return [...map.entries()].sort((a,b)=>a[0]-b[0]).map(e=>e[1]);
+  });
+  function applyFrags(){
+    groups[i].forEach((g,gi)=>g.forEach(el=>el.classList.toggle('on',gi<f)));
+  }
+
+  /* ---- signature: slide progress as a small search tree ---- */
+  const rail=document.getElementById('rail');
+  function drawRail(){
+    const n=slides.length,dx=25,h=52;
+    rail.setAttribute('width',n*dx+18);rail.setAttribute('height',h);
+    const FISH='M0 554.58C0 539.58 12.28 527.30 27.28 527.30C137.78 527.30 237.37 570.95 311.03 641.90C350.59 588.70 376.51 524.72 381.97 453.78L154.15 452.53C139.15 452.53 126.87 440.26 126.87 425.25C126.87 410.24 139.15 397.97 154.15 397.97L410.62 397.97C582.50 397.97 744.84 464.81 866.25 586.22L941.28 661.25C946.73 666.71 949.46 673.53 949.46 680.35C949.46 687.17 946.73 693.99 941.28 699.45L866.25 774.48C744.84 896.89 582.50 963.73 410.62 963.73L154.15 963.73C139.15 963.73 126.87 951.46 126.87 936.45C126.87 921.44 139.15 909.17 154.15 909.17L381.97 909.17C376.51 839.69 350.59 774.21 311.03 721.01C237.37 791.95 137.78 835.60 27.28 835.60C12.28 835.60 0 823.32 0 808.32C0 793.31 12.28 781.03 27.28 781.03C124.14 781.03 211.45 742.84 275.56 680.09C211.45 617.33 124.14 579.14 27.28 579.14C12.28 581.87 0 569.59 0 554.58ZM883.98 682.81L828.05 626.88C723.01 521.84 585.23 460.45 436.53 455.00C431.08 540.94 398.34 620.06 347.86 682.81C398.34 745.57 431.08 824.69 436.53 910.63C583.87 903.81 723.01 843.79 828.05 738.74L883.98 682.81Z';
+    let x=11,prev=null,parts=[
+      '<defs><path id="railf" d="'+FISH+'" fill-rule="evenodd" vector-effect="non-scaling-stroke"/></defs>'
+    ];
+    const ys={teal:38,orange:14,purple:38,magenta:14}; // alternate branch levels
+    slides.forEach((sl,k)=>{
+      const sec=sl.dataset.sec,y=ys[sec],c=secColor[sec];
+      const on=k===i,done=k<i;
+      if(prev){parts.push('<line x1="'+(prev.x+8)+'" y1="'+prev.y+'" x2="'+(x-8)+'" y2="'+y+'" stroke="'+c+'" stroke-width="'+(k<=i?1.8:0.7)+'" opacity="'+(k<=i?0.85:0.3)+'"/>');}
+      const s=on?0.0185:0.0135;
+      const cls=(on&&k===n-1)?' class="pulse"':'';
+      parts.push('<use href="#railf"'+cls+' transform="translate('+x+','+y+') scale('+s+') translate(-474.7,-680.85)" fill="'+(on||done?c:'none')+'" opacity="'+(on?1:done?0.88:0.5)+'" stroke="'+c+'" stroke-width="'+(on?1.3:done?1:0.5)+'"/>');
+      prev={x,y};x+=dx;
+    });
+    rail.innerHTML=parts.join('');
+  }
+
+  /* ---- sakana.ai fish school (p5 sketch in js/sketch.js) ---- */
+  window.__fishMount=function(){lifeOn(slides[i].querySelector('.fish-slot'));};
+
+  /* ---- slide 2: goal types in; key variables get selected and circled in the DYNAMO code ---- */
+  const DYNEDGES=[[2,6],[2,28],[2,35],[2,52],[2,80],[2,86],[2,109],[4,3],[6,2],[7,6],[8,6],[9,6],[11,6],[12,11],[14,11],[14,40],[14,91],[14,133],[14,148],[15,14],[17,14],[19,17],[20,19],[22,19],[24,22],[26,22],[26,25],[28,24],[29,28],[30,28],[31,28],[35,2],[36,35],[37,35],[38,35],[40,35],[41,40],[43,35],[44,43],[46,35],[47,46],[49,35],[50,49],[52,49],[52,56],[52,71],[52,136],[53,52],[54,52],[56,6],[57,56],[59,6],[60,59],[62,6],[63,62],[65,46],[65,59],[65,127],[65,139],[66,65],[67,65],[68,65],[69,65],[71,65],[72,71],[74,65],[75,74],[77,74],[78,17],[78,77],[80,17],[80,77],[80,114],[82,80],[82,94],[84,83],[86,82],[87,86],[88,86],[89,86],[91,86],[92,91],[94,82],[95,94],[96,94],[97,94],[99,65],[100,99],[102,43],[102,62],[102,99],[102,119],[102,142],[103,102],[105,102],[105,117],[107,106],[109,105],[110,109],[111,109],[112,109],[114,109],[115,114],[117,105],[119,117],[120,119],[122,17],[122,77],[124,123],[125,122],[127,122],[128,127],[131,130],[133,130],[133,153],[134,133],[136,130],[137,136],[139,130],[139,153],[140,139],[142,130],[143,142],[148,28],[149,148],[153,122],[154,153],[165,164],[166,164],[167,164],[170,169],[171,169],[172,169]];
+  const pitch={timers:[],chars:null,ends:{},circles:{},built:false};
+  function gv(v){return slides[1].querySelector('.gv[data-v="'+v+'"]');}
+  function pitchBuild(){
+    if(pitch.built)return;pitch.built=true;
+    const box=slides[1].querySelector('.goalbox');
+    const chars=[];
+    (function walk(n){[...n.childNodes].forEach(c=>{
+      if(c.nodeType===3){
+        const frag=document.createDocumentFragment();
+        for(const ch of c.textContent){const s=document.createElement('i');s.className='tw';s.textContent=ch;frag.appendChild(s);chars.push(s);}
+        c.replaceWith(frag);
+      }else if(c.nodeType===1)walk(c);
+    });})(box);
+    pitch.chars=chars;
+    ['1','2','3'].forEach(v=>{
+      const tws=gv(v).querySelectorAll('.tw');
+      pitch.ends[v]=chars.indexOf(tws[tws.length-1]);
+      const el=document.createElement('div');el.className='codecircle cc'+v;
+      slides[1].querySelector('.dyncard').appendChild(el);pitch.circles[v]=el;
+    });
+    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('class','depsvg');
+    svg.innerHTML='<defs><marker id="deparr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" fill="context-stroke"/></marker></defs>';
+    slides[1].querySelector('.dyncard').appendChild(svg);pitch.svg=svg;
+  }
+  function lineRect(n){
+    const el=slides[1].querySelector('[data-i="'+n+'"]');if(!el)return null;
+    const card=slides[1].querySelector('.dyncard');
+    const cr=card.getBoundingClientRect(),sc=cr.width/card.offsetWidth;
+    const r=el.getBoundingClientRect();
+    return {x:(r.left-cr.left)/sc,y:(r.top-cr.top)/sc,w:r.width/sc,h:r.height/sc};
+  }
+  function depDraw(e,animate){
+    const a=lineRect(e[0]),b=lineRect(e[1]);if(!a||!b)return;
+    const x1=a.x+Math.min(56,a.w*0.3),y1=a.y+a.h/2,x2=b.x+Math.min(44,b.w*0.25),y2=b.y+b.h/2;
+    const bend=Math.min(60,26+Math.abs(y2-y1)*0.12);
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M'+x1+','+y1+' C'+(x1+bend)+','+y1+' '+(x2-bend)+','+y2+' '+x2+','+y2);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke','#8A9096');
+    p.setAttribute('stroke-width','1.1');
+    p.setAttribute('marker-end','url(#deparr)');
+    p.setAttribute('opacity','0.65');
+    pitch.svg.appendChild(p);
+    if(animate){
+      const len=p.getTotalLength();
+      p.style.strokeDasharray=len;p.style.strokeDashoffset=len;
+      p.animate([{strokeDashoffset:len},{strokeDashoffset:0}],{duration:480,easing:'ease-out',fill:'forwards'});
+      pitch.timers.push(setTimeout(function(){
+        p.animate([{opacity:0.65},{opacity:0}],{duration:420,fill:'forwards'});
+        pitch.timers.push(setTimeout(function(){p.remove();},460));
+      },900));
+    }
+  }
+  function depStorm(){
+    pitch.timers.push(setInterval(function(){
+      depDraw(DYNEDGES[Math.floor(Math.random()*DYNEDGES.length)],true);
+      depDraw(DYNEDGES[Math.floor(Math.random()*DYNEDGES.length)],true);
+      if(Math.random()<0.6)depDraw(DYNEDGES[Math.floor(Math.random()*DYNEDGES.length)],true);
+    },110));
+  }
+  function pitchPlace(){
+    const card=slides[1].querySelector('.dyncard');
+    const cr=card.getBoundingClientRect();
+    const sc=cr.width/card.offsetWidth;
+    ['1','2','3'].forEach(v=>{
+      const t=slides[1].querySelector('#dv'+v);if(!t)return;
+      const r=t.getBoundingClientRect(),el=pitch.circles[v];
+      el.style.left=((r.left-cr.left)/sc-8)+'px';
+      el.style.top=((r.top-cr.top)/sc-4)+'px';
+      el.style.width=(r.width/sc+16)+'px';
+      el.style.height=(r.height/sc+8)+'px';
+    });
+  }
+  function pitchStop(){pitch.timers.forEach(t=>{clearInterval(t);clearTimeout(t);});pitch.timers=[];}
+  function pitchPair(v,on){gv(v).classList.toggle('sel',on);pitch.circles[v].classList.toggle('on',on);}
+  function pitchPlay(){
+    pitchBuild();pitchPlace();
+    pitch.chars.forEach(c=>c.classList.remove('on'));
+    ['1','2','3'].forEach(v=>pitchPair(v,false));
+    if(pitch.svg)pitch.svg.querySelectorAll('path').forEach(p=>p.remove());
+    if(reduced||still){
+      pitch.chars.forEach(c=>c.classList.add('on'));
+      ['1','2','3'].forEach(v=>pitchPair(v,true));
+      for(let k=0;k<32;k++)depDraw(DYNEDGES[(k*5)%DYNEDGES.length],false);
+      return;
+    }
+    let k=0;
+    const iv=setInterval(()=>{
+      if(k<pitch.chars.length){
+        pitch.chars[k].classList.add('on');
+        ['1','2','3'].forEach(v=>{if(k===pitch.ends[v])pitchPair(v,true);});
+        k++;
+      }else{
+        clearInterval(iv);
+        pitch.timers.push(setTimeout(depStorm,900));
+      }
+    },9);
+    pitch.timers.push(iv);
+  }
+  function lifeOn(slot){
+    const cnv=document.getElementById('defaultCanvas0');
+    if(slot&&!cnv){ // p5 may not have finished setup yet on first show
+      setTimeout(()=>{const s=slides[i].querySelector('.fish-slot');if(s)lifeOn(s);},80);
+      return;
+    }
+    if(!cnv)return;
+    if(slot){
+      if(cnv.parentElement!==slot)slot.appendChild(cnv);
+      cnv.style.display='block';
+      if(reduced||still){redraw();noLoop();}else{loop();}
+    }else{
+      cnv.style.display='none';
+      noLoop();
+    }
+  }
+
+  function setHash(){history.replaceState(null,'','#/'+(i+1)+(f?'/'+f:''));}
+
+  function show(k,frags){
+    i=Math.max(0,Math.min(slides.length-1,k));
+    f=Math.max(0,Math.min(groups[i].length,frags===undefined?0:frags));
+    slides.forEach((s,j)=>s.classList.toggle('current',j===i));
+    const cur=slides[i];
+    stage.style.setProperty('--sec',secColor[cur.dataset.sec]);
+    cur.style.setProperty('--sec',secColor[cur.dataset.sec]);
+    document.getElementById('counter').textContent=`${i+1} / ${slides.length}`;
+    lifeOn(cur.querySelector('.fish-slot'));
+    applyFrags();setHash();drawRail();
+    pitchStop();
+    if(i===1)setTimeout(pitchPlay,60);
+  }
+  function next(){
+    if(f<groups[i].length){f++;applyFrags();setHash();}
+    else show(i+1);
+  }
+  function prev(){
+    if(f>0){f--;applyFrags();setHash();}
+    else if(i>0)show(i-1,groups[i-1].length);
+  }
+
+  addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();next();}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
+    else if(e.key==='Home')show(0);
+    else if(e.key==='End')show(slides.length-1,groups[slides.length-1].length);
+    else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  });
+  stage.addEventListener('click',e=>{
+    if(e.clientX>innerWidth/2)next();else prev();
+  });
+  let tx=null,ty=null;
+  addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+  addEventListener('touchend',e=>{
+    if(tx===null)return;
+    const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+    tx=ty=null;
+    if(Math.abs(dx)>44&&Math.abs(dx)>1.6*Math.abs(dy)){
+      e.preventDefault(); // a swipe, not a tap: do not let the click zones fire too
+      if(dx<0)next();else prev();
+    }
+  });
+
+  const m=location.hash.match(/#\/(\d+)(?:\/(\d+))?/);
+  show(m?+m[1]-1:0,m&&m[2]?+m[2]:0);
+})();
+</script>
+</body>
+</html>
