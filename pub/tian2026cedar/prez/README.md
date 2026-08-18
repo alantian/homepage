@@ -8,6 +8,7 @@ Goal-Directed Optimization of Complex Systems* (Yingtao Tian, Sakana AI).
 
 Open `index.html` in any browser, or serve for another machine with
 `python3 serve.py` (port 8123, binds 0.0.0.0) and open `http://<host>:8123/`.
+The per-slide speaker script with timings is in `talk-script.md`.
 
 Keys: `→` / `Space` next build step or slide, `←` back, `F` fullscreen,
 `Home`/`End` jump. `#/N/F` deep-links slide N with F build steps shown.
