@@ -1,0 +1,18 @@
+# LaTeX intermediates
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.toc
+*.out
+*.synctex.gz
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# local deploy tooling (not for the public repo)
+deploy_*.sh
