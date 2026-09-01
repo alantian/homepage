@@ -228,6 +228,14 @@
   .isym{height:1em;vertical-align:-.12em}
 
   /* ============ per-slide additions ============ */
+  /* slide 14: ladder fills from the bottom band upward */
+  .current .s14 .ladder.stagger>*:nth-child(7){animation-delay:0.10s}
+  .current .s14 .ladder.stagger>*:nth-child(6){animation-delay:0.24s}
+  .current .s14 .ladder.stagger>*:nth-child(5){animation-delay:0.38s}
+  .current .s14 .ladder.stagger>*:nth-child(4){animation-delay:0.52s}
+  .current .s14 .ladder.stagger>*:nth-child(3){animation-delay:0.66s}
+  .current .s14 .ladder.stagger>*:nth-child(2){animation-delay:0.80s}
+  .current .s14 .ladder.stagger>*:nth-child(1){animation-delay:0.94s}
   /* slide 23 */
   /* slide 23 (lane D): the tree PNG has a white ground; multiply it onto paper so the onpaper covers are invisible.
      Table borders live on cells (not rows) so a row that is still a hidden .frag leaves no ruled line behind. */
@@ -709,9 +717,9 @@
   <div class="eyebrow">Method: move 1</div>
   <h1 class="a-rise">Four components, from 21 lines <span class="accent">to World Dynamics</span></h1>
   <div class="cols" style="gap:26px;flex:0 0 auto">
-    <div class="a-rise d1" style="flex:0 0 432px;min-width:0">
+    <div class="a-rise d1" style="flex:0 0 460px;min-width:0">
       <div class="tiny soft" style="font-family:var(--mono);margin-bottom:4px">code-core-mdbs_2_2.py (complete, 21 lines)</div>
-      <pre class="code" style="font-size:12.5px;line-height:1.38;padding:12px 12px"><span class="row hl"><span class="ln">1</span><span class="c"># (1) initialization </span>
+      <pre class="code" style="font-size:13px;line-height:1.38;padding:12px 12px"><span class="row hl"><span class="ln">1</span><span class="c"># (1) initialization </span>
 <span class="ln">2</span>dt = <span class="n">0.01</span>
 <span class="ln">3</span>t0 = <span class="n">0.0</span>
 <span class="ln">4</span>tf = <span class="n">120.0</span>
@@ -729,13 +737,13 @@
     </div>
     <div class="a-rise d2" style="flex:1;min-width:0">
       <div class="tiny soft" style="font-family:var(--mono);margin-bottom:4px">code-core-world-dynamics.py (excerpt)</div>
-      <pre class="code" style="font-size:12.5px;line-height:1.38;padding:12px 12px"><span class="row hl" style="position:relative"><i style="position:absolute;right:8px;top:3px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal;background:var(--card)">1 init</i><span class="c"># ====================== BEGIN STATE =========================</span>
+      <pre class="code" style="font-size:13px;line-height:1.38;padding:12px 12px"><span class="row hl" style="position:relative"><i style="position:absolute;right:8px;top:3px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal;background:var(--card)">1 init</i><span class="c"># ====================== BEGIN STATE =========================</span>
 <span class="c"># STATE VARIABLES - integrated over time (must define derivatives below)</span>
 P = <span class="n">1.65e9</span>  <span class="c"># population (people)</span> <span class="k"># NECESSARY</span>
 NR = <span class="n">900e9</span>  <span class="c"># natural resources (natural resource units)</span> <span class="k"># NECESSARY</span>
 CI = <span class="n">0.4e9</span>  <span class="c"># capital investment (capital units)</span> <span class="k"># NECESSARY</span>
 POL = <span class="n">0.2e9</span>  <span class="c"># pollution (pollution units)</span> <span class="k"># NECESSARY</span>
-CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agriculture fraction (dimensionless)</span> <span class="k"># NECESSARY</span>
+CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agriculture fraction</span> <span class="k"># NECESSARY</span>
 <span class="c"># ======================= END STATE ==========================</span></span><span class="gap" style="height:4px"></span><span class="row hl frag" data-o="1" style="position:relative"><i style="position:absolute;right:8px;top:3px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal;background:var(--card)">2 intermediate</i>    <span class="c"># ... about 40 helper lines elided (multipliers, rates, flows) ...</span></span><span class="gap" style="height:4px"></span><span class="row hl frag" data-o="2" style="position:relative"><i style="position:absolute;right:8px;top:3px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal;background:var(--card)">3 derivatives</i>    <span class="c"># State derivatives</span>
     dP = BR - DR
     dNR = -NRUR
@@ -827,7 +835,7 @@ CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agric
   <h1 class="a-rise" style="margin-bottom:18px">Inside the prompts: <span class="accent">four slots</span>, one shared rubric, two output shapes</h1>
   <div class="cols" style="gap:28px;align-items:stretch;flex:0 0 auto">
     <div class="col a-rise d1" style="display:flex;flex-direction:column">
-      <pre class="code wrap" style="font-size:12.5px;line-height:1.36;flex:1;padding:10px 16px"><span class="row" style="position:relative"><i style="position:absolute;right:8px;top:2px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal">LLM Judge</i><b>ANALYZE SIMULATION RESULTS FOR TREE-BASED OPTIMIZATION</b></span><span class="row hl frag" data-o="1"><span class="k">GOAL:</span>               <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{goal}</span></span><span class="row hl frag" data-o="1"><span class="k">CURRENT CODE:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{code}</span></span><span class="row hl frag" data-o="1"><span class="k">SIMULATION RESULTS:</span> <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{csv_data}</span></span><span class="row hl frag" data-o="1"><span class="k">TREE CONTEXT:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{tree_context}</span></span><span class="row"><span class="c">=== For your reference ===</span>
+      <pre class="code wrap" style="font-size:13px;line-height:1.36;flex:1;padding:10px 16px"><span class="row" style="position:relative"><i style="position:absolute;right:8px;top:2px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal">LLM Judge</i><b>ANALYZE SIMULATION RESULTS FOR TREE-BASED OPTIMIZATION</b></span><span class="row hl frag" data-o="1"><span class="k">GOAL:</span>               <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{goal}</span></span><span class="row hl frag" data-o="1"><span class="k">CURRENT CODE:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{code}</span></span><span class="row hl frag" data-o="1"><span class="k">SIMULATION RESULTS:</span> <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{csv_data}</span></span><span class="row hl frag" data-o="1"><span class="k">TREE CONTEXT:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{tree_context}</span></span><span class="row"><span class="c">=== For your reference ===</span>
 <span class="k">Format for code in tree context:</span> shows only the differences in
   each reference node compared to current code; lines starting
   with "+" show what the reference node has instead
@@ -844,7 +852,7 @@ CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agric
 <span class="k">SCORE:</span> [numerical score based on the scoring guidelines]</span></pre>
     </div>
     <div class="col a-rise d2" style="display:flex;flex-direction:column">
-      <pre class="code wrap" style="font-size:12.5px;line-height:1.36;flex:1;padding:10px 16px"><span class="row" style="position:relative"><i style="position:absolute;right:8px;top:2px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal">LLM Editor</i><b>SUGGEST CODE MODIFICATIONS FOR TREE SEARCH OPTIMIZATION</b></span><span class="row hl frag" data-o="1"><span class="k">GOAL:</span>               <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{goal}</span></span><span class="row hl frag" data-o="1"><span class="k">CURRENT CODE:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{code}</span></span><span class="row hl frag" data-o="1"><span class="k">SIMULATION RESULTS:</span> <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{csv_data}</span></span><span class="row hl frag" data-o="1"><span class="k">TREE CONTEXT:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{tree_context}</span></span><span class="row"><span class="c">=== For your reference ===</span>
+      <pre class="code wrap" style="font-size:13px;line-height:1.36;flex:1;padding:10px 16px"><span class="row" style="position:relative"><i style="position:absolute;right:8px;top:2px;font:600 11px/1.3 var(--sans);letter-spacing:.06em;color:var(--sec);border:1px solid var(--sec);border-radius:999px;padding:1px 8px;font-style:normal">LLM Editor</i><b>SUGGEST CODE MODIFICATIONS FOR TREE SEARCH OPTIMIZATION</b></span><span class="row hl frag" data-o="1"><span class="k">GOAL:</span>               <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{goal}</span></span><span class="row hl frag" data-o="1"><span class="k">CURRENT CODE:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{code}</span></span><span class="row hl frag" data-o="1"><span class="k">SIMULATION RESULTS:</span> <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{csv_data}</span></span><span class="row hl frag" data-o="1"><span class="k">TREE CONTEXT:</span>       <span class="chip acc" style="font-size:12px;line-height:1.2;padding:1px 8px;margin:0">{tree_context}</span></span><span class="row"><span class="c">=== For your reference ===</span>
 <span class="k">Format for code in tree context:</span> same diff format as the Judge
 <span class="k">Focus on:</span> parameters within the marked BEGIN/END edit sections;
   state variables, constants, simulation configuration;
@@ -872,14 +880,14 @@ CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agric
   <div class="cols" style="gap:30px;flex:0 0 auto">
     <div style="flex:0 0 716px;min-width:0">
       <div class="tiny a-rise" style="font-family:var(--mono);color:var(--ink-soft);margin-bottom:10px">SCORING SCALE (use 2 decimal places like 7.25, 12.75)</div>
-      <div class="ladder stagger" style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">20.00+</span><span class="band" style="padding:6px 10px"><b>EXCEPTIONAL performance</b> - far surpasses what the goal was asking for</span></div>
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">10.00+</span><span class="band" style="padding:6px 10px"><b>VERY GOOD performance</b> - exceeds the goal expectations significantly</span></div>
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">8.00-10.00</span><span class="band" style="padding:6px 10px"><b>Excellent progress</b> - meets most requirements of the optimization goal</span></div>
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">6.00-8.00</span><span class="band" style="padding:6px 10px"><b>Good progress</b> - clear advancement with substantial goal achievement</span></div>
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">4.00-6.00</span><span class="band" style="padding:6px 10px"><b>Moderate progress</b> - measurable improvement and moving toward the goal</span></div>
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">2.00-4.00</span><span class="band" style="padding:6px 10px"><b>Partial progress</b> - some improvement but far from achieving the goal</span></div>
-        <div style="display:grid;grid-template-columns:84px 1fr;column-gap:12px;align-items:center"><span class="rng">0.00-2.00</span><span class="band" style="padding:6px 10px"><b>Failed progress</b> - no meaningful progress toward the goal</span></div>
+      <div class="ladder stagger" style="display:flex;flex-direction:column;gap:8px;align-items:stretch">
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">20.00+</span><span class="band" style="padding:6px 10px"><b>EXCEPTIONAL performance</b> - far surpasses what the goal was asking for</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">10.00+</span><span class="band" style="padding:6px 10px"><b>VERY GOOD performance</b> - exceeds the goal expectations significantly</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">8.00-10.00</span><span class="band" style="padding:6px 10px"><b>Excellent progress</b> - meets most requirements of the optimization goal</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">6.00-8.00</span><span class="band" style="padding:6px 10px"><b>Good progress</b> - clear advancement with substantial goal achievement</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">4.00-6.00</span><span class="band" style="padding:6px 10px"><b>Moderate progress</b> - measurable improvement and moving toward the goal</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">2.00-4.00</span><span class="band" style="padding:6px 10px"><b>Partial progress</b> - some improvement but far from achieving the goal</span></div>
+        <div style="display:grid;grid-template-columns:96px 1fr;column-gap:12px;align-items:center"><span class="rng">0.00-2.00</span><span class="band" style="padding:6px 10px"><b>Failed progress</b> - no meaningful progress toward the goal</span></div>
       </div>
       <p class="small soft a-rise d3" style="margin-top:16px">Primary principle: score how well this code achieves the optimization goal, regardless of other nodes in the tree.</p>
     </div>
@@ -907,12 +915,11 @@ CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agric
   <h1 class="a-rise">The search tree is a <span class="accent">structured population</span></h1>
   <div class="cols" style="flex:0 0 auto;margin:auto 0">
     <div class="col a-rise d1" style="flex:1.3">
-      <p style="font-weight:650;margin-bottom:8px">Generalized UCT selection</p>
+      <p style="font-weight:650;margin-bottom:8px">Generalized UCT selection <span class="soft" style="font-weight:400">(upper confidence bound applied to trees)</span></p>
       <div class="formula" style="text-align:center"><img src="images/f-uct.svg" alt="Score(v) = S_v + alpha * sqrt(ln(c_p+1)/(c_v+1)) * I[c_v &lt; tau] + gamma * Depth(v)" style="height:54px;max-width:100%"></div>
       <ul class="small" style="margin-top:14px">
         <li>exploration (<img src="images/sym-alpha.svg" alt="alpha" style="height:12px">) + depth bonus (<img src="images/sym-gamma.svg" alt="gamma" style="height:15px;vertical-align:-4px">) + progressive widening (<img src="images/sym-tau.svg" alt="tau" style="height:11px">)</li>
         <li>nodes re-expandable until <img src="images/expr-cvtau.svg" alt="c_v &gt;= tau" style="height:15px;vertical-align:-3px">, unlike vanilla MCTS</li>
-        <li>formally a principled MCTS variant: Editor = stochastic transition kernel, Judge = noisy value function</li>
       </ul>
     </div>
     <div class="col">
@@ -956,7 +963,7 @@ CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agric
     <div class="col">
       <p class="small" style="font-weight:650;margin-bottom:8px">Why these two, from the appendix</p>
       <div class="quote">"high-quality solutions often result from several consecutive refinements among a promising branch, so our choice should favour deeper nodes, cap expansion counts, thus avoiding over-exploring shallow nodes with expensive LLM calls"</div>
-      <p class="small soft">In our runs <img src="images/expr-a1g2.svg" alt="alpha = 1, gamma = 2" style="height:16px;vertical-align:-4px">, set empirically; tau is the knob that bounds how often any one node is re-expanded.</p>
+      <p class="small soft">In our runs <img src="images/expr-a1g2.svg" alt="alpha = 1, gamma = 2" style="height:16px;vertical-align:-4px">, set empirically.</p>
     </div>
   </div>
 </section>
@@ -980,7 +987,7 @@ CIAF = <span class="n">0.2</span>  <span class="c"># capital-investment-in-agric
     <div class="cols" style="flex:0 0 auto;gap:28px;align-items:flex-start">
       <div class="formula" style="flex:0 0 704px;text-align:center"><img src="images/f-value-fn.svg" alt="(A_u, S_u) = R_phi(P_u, R_u, G), R_phi = LlmJudge_phi, S_u = pi_S(R_phi(P_u, R_u, G))" style="height:20px;max-width:100%"></div>
       <ul style="flex:1;margin:2px 0 0;padding-left:22px">
-        <li style="font-size:17px;line-height:1.45;margin-bottom:6px">"S_u constitutes a bounded, noisy reward"; semantic LLM scoring is treated as non-adversarial</li>
+        <li style="font-size:17px;line-height:1.45;margin-bottom:6px">"<i>S</i><sub>u</sub> constitutes a bounded, noisy reward"; semantic LLM scoring is treated as non-adversarial</li>
         <li style="font-size:17px;line-height:1.45;margin-bottom:0">"UCT remains consistent when reward noise is bounded and non-adversarial" (Lisy 2013; Efroni 2019)</li>
       </ul>
     </div>
@@ -1198,6 +1205,7 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
     NOMINAL_DR = (<span class="f">exp</span>(-0.01 * t) * 0.03 + 0.01) * 1 + 0.04 * 0
     DR_DISTRIBUTION = <span class="f">normal</span>(NOMINAL_DR, 0.005 * POPULATION)
     DR_DIST_CONTROL = DR_DISTRIBUTION <span class="k">if</span> (DR_DISTRIBUTION &gt;= 0.01 <span class="k">and</span> DR_DISTRIBUTION &lt;= 1) <span class="k">else</span> 0.01
+    DEATH_RATE = ( (DR_DIST_CONTROL <span class="k">if</span> DR_DIST_CONTROL &gt; NOMINAL_DR <span class="k">else</span> NOMINAL_DR) * 1 + 0 * DR_DIST_CONTROL + 0 * NOMINAL_DR )
     DEATHS = DEATH_RATE * POPULATION
 <span class="gap"></span>    dPOPULATION = BIRTHS - DEATHS</pre>
   <div class="cols frag" data-o="1" style="flex:0 0 auto;gap:24px;margin-top:12px;align-items:stretch">
@@ -1217,7 +1225,7 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
       <p class="tiny soft">The ground truth's own formulae: pure parameter fitting</p>
     </div>
   </div>
-  <p class="tiny soft a-rise d3" style="margin-top:10px">Optuna: 100 trials per variant. Metrics: L1 and DTW (dtaidistance), Sakoe-Chiba band w = 250, 7.1% of the 3500 steps, inside the recommended 5 to 10%.</p>
+  <p class="tiny soft a-rise d3" style="margin-top:10px">Optuna: 100 trials per variant. Metrics: L1 and DTW (via the dtaidistance library), Sakoe-Chiba band w = 250, 7.1% of the 3500 steps, inside the recommended 5 to 10%.</p>
 </section>
 
 <!-- 26 ============================================================== -->
@@ -1262,7 +1270,7 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
       <div class="cover a-drawx d2" style="left:0;top:0;width:100%;height:100%"></div>
     </div></figure>
   </div>
-  <p class="tiny soft a-rise" style="margin-top:8px;text-align:center;animation-delay:3.0s">10 random seeds of the ground truth: the stochastic death rate makes the volatility intrinsic, and CEDAR's fit sits within that band.</p>
+  <p class="tiny soft a-rise" style="margin-top:8px;text-align:center;animation-delay:3.0s">10 random seeds of the ground truth: the stochastic death rate makes the volatility intrinsic; CEDAR's record (previous slide) generally falls within this band.</p>
   <div class="cols" style="flex:0 0 auto;margin:auto 0;gap:36px;align-items:center">
     <div class="col a-rise" style="flex:0 0 auto;animation-delay:3.3s">
       <pre class="code" style="display:inline-block;font-size:14px">DR_DISTRIBUTION = <span class="f">normal</span>(NOMINAL_DR, 0.005 * POPULATION)</pre>
@@ -1319,14 +1327,14 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
     <li class="small" style="margin-bottom:6px"><b>Performance.</b> MCTS yields higher-scoring nodes than linear search (next slide).</li>
     <li class="small" style="margin-bottom:0"><b>Open-ended discovery.</b> A branching tree, rather than convergence to a single point, preserves structurally distinct high-performing systems, each emphasizing different trade-offs among objectives.</li>
   </ul>
-  <div class="kicker a-rise d5" style="color:var(--purple)">Why MCTS with LLMs: diversity, performance, and open-ended discovery.</div>
+  <div class="kicker a-rise d5" style="color:var(--purple)">In ALife, exploring a range of emergent behaviors matters alongside optimizing one objective.</div>
 </section>
 
 <!-- 30 ============================================================== -->
 <section data-sec="purple" data-row="a" class="slide">
   <div class="eyebrow">Results: why MCTS</div>
   <h1 class="a-rise" style="margin-bottom:16px">Ablation: the tree beats the line, <span class="accent">in score and in dynamics</span></h1>
-  <div class="cols" style="gap:40px;align-items:center">
+  <div class="cols" style="gap:40px;align-items:stretch">
     <div class="col a-rise d1" style="flex:0 0 400px">
       <figure class="imgcard">
         <div class="fig" style="display:block">
@@ -1336,8 +1344,8 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
         <figcaption class="small">Node scores, Linear vs CEDAR: "MCTS attains higher-scoring nodes than linear search."</figcaption>
       </figure>
     </div>
-    <div class="col a-rise d2" style="flex:1">
-      <figure class="imgcard">
+    <div class="col a-rise d2" style="flex:1;display:flex;flex-direction:column">
+      <figure class="imgcard" style="flex:1;display:flex;flex-direction:column;justify-content:center">
         <div class="fig" style="display:block">
           <img src="images/population_comparison.png" style="width:100%" alt="Population trajectories of linear-search and CEDAR solutions, two each">
           <div class="cover a-drawx d2" style="left:0;top:0;width:100%;height:100%"></div>
@@ -1386,8 +1394,8 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
 <section data-sec="magenta" data-row="b" class="slide">
   <div class="eyebrow">Limits &amp; next</div>
   <h1 class="a-rise">Limits, open theory, and <span class="accent">what comes next</span></h1>
-  <div class="cols stagger" style="flex:0 0 auto;margin:auto 0;gap:36px">
-    <div class="col" style="flex:1.3">
+  <div class="cols stagger" style="flex:0 0 auto;margin:auto 0;gap:40px">
+    <div class="col" style="flex:1.25">
       <p style="font-weight:650;margin-bottom:10px">Limits</p>
       <ul class="small">
         <li class="small" style="margin-bottom:8px">Judge scores what a same-class LLM edited: circularity risk for abstract goals</li>
@@ -1403,14 +1411,14 @@ SUM_POP = 0.0  <span class="c"># NECESSARY</span>
         <li class="small" style="margin-bottom:8px">When is LLM variation/evaluation <i>necessary</i>, not merely helpful?</li>
         <li class="small" style="margin-bottom:0">More systems, more domains</li>
       </ul>
-    </div>
-    <div class="col card acc" style="flex:0.8;align-self:flex-start">
-      <h3>In the appendix</h3>
+      <div class="card acc" style="margin-top:22px">
+        <h3>In the appendix</h3>
       <ul class="small" style="padding-left:22px">
         <li class="small" style="margin-bottom:8px">Full prompts and rubric</li>
         <li class="small" style="margin-bottom:8px">System code</li>
         <li class="small" style="margin-bottom:0">Complete Judge and Editor transcripts</li>
       </ul>
+      </div>
     </div>
   </div>
 </section>

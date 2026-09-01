@@ -249,8 +249,7 @@ PRESS. Step three, the Judge, our fitness function, reads that record and
 returns a bounded score plus a written analysis that feeds the next edit.
 So this is a generate-and-evaluate loop, very much in the spirit of
 evolutionary computation. Both prompts cover system context, tree context,
-and structural constraints, and together with the code representation that
-contextualization is essential; the method doesn't work without it.
+and structural constraints.
 
 ## 13. Inside the prompts (1:20 / cum 14:05)
 
@@ -303,7 +302,8 @@ Calibration against the rest of the tree is not decoration.
 Move three is how the search is steered, and here's the mapping to
 evolutionary computation, since that's the frame we think in. Nodes are
 candidate systems. The Editor is the variation operator. The Judge is the
-fitness function. Selection is a generalized UCT score, on the left: the
+fitness function. Selection is a generalized UCT score, upper confidence bound applied to
+trees, on the left: the
 node's score, plus an exploration term, plus a depth bonus. And one thing
 unlike vanilla MCTS: internal nodes stay expandable until their expansion
 count reaches tau, so a promising ancestor keeps producing children. Read
@@ -332,7 +332,7 @@ positive. The rationale, quoted on the right from the appendix: high-quality
 solutions often result from several consecutive refinements among a
 promising branch, so favour deeper nodes and cap expansion counts, avoiding
 over-exploring shallow nodes with expensive LLM calls. In our runs alpha is
-one and gamma is two. Tau stays a symbol here.
+one and gamma is two.
 
 ## 17. Read formally (1:15 / cum 18:30)
 
@@ -388,7 +388,7 @@ goal, and as ground truths that produce records to fit.
 Middle, search. Twenty node selections, five candidates each, so one hundred
 expansions per search. Alpha one, gamma two. Two backends, Claude Sonnet 4.5
 and GPT-5.1, at default decoding, with structured outputs and up to three
-retries; if all three fail, that expansion is discarded. Crashed or
+retries. Crashed or
 NaN-valued runs get a low score, so the tree backtracks around them on its
 own.
 
@@ -399,7 +399,7 @@ takes about thirty minutes, bounded by LLM calls, not local compute.
 
 ## 20. Experiment 1: the goal (1:20 / cum 21:55)
 
-[The goal box types in; the three reasons stagger; the dependency graph
+[The goal box rises in; the three reasons stagger; the dependency graph
 slowly zooms on the right.]
 
 Two experiments. The first is the abstract goal from the opening, and here
@@ -501,9 +501,8 @@ standard of living. CIM, the capital investment multiplier. POLCM, pollution
 from capital. POLAT, the pollution absorption time.
 
 PRESS. Four cards, by direction, as the Judge reads the edit. NRMM down,
-hard: roughly ninety percent, a maximum of 4.0 in the baseline down to
-0.078. POLCM down harder, about ninety-five percent. CIM up, for capital
-productivity. POLAT two to three times higher than the parent nodes. The
+hard. POLCM down harder. CIM up, for capital productivity. POLAT two to
+three times higher than the parent nodes. The
 outcomes, quoted from the Judge: population from one point six five to
 ten point five seven billion, six point four times; resources decline only
 nineteen point nine percent, nine hundred billion to seven hundred twenty;
