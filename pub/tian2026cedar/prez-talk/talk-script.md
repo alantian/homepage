@@ -79,7 +79,7 @@ PRESS. Historically, that f lived in one of two languages. DYNAMO, with
 nineteen-sixties syntax; the line on the right is a real level equation,
 population at K equals population at J plus DT times births minus deaths.
 Or STELLA, a proprietary visual tool. That's the code that flickered behind
-the arrows on slide two. And the strip at the bottom is how far the
+the arrows on slide two. And the chips at the top right are how far the
 framework travelled: global dynamics, pandemics, social simulations, biology,
 economics, thermodynamics, and on into policy design.
 
@@ -191,8 +191,8 @@ Biological Systems, each with twenty to sixty-nine integrated variables.
 
 Every system in our corpus has the same four-part shape. Left, the smallest
 example in the paper, twenty-one lines: logistic growth of a single stock N.
-Right, the same skeleton at the scale of World Dynamics, with forty helper
-lines elided in the middle.
+Right, the same skeleton at the scale of World Dynamics, with about forty
+helper lines elided in the middle.
 
 Part one, initialization, top of both listings: time step, start and end
 time, initial values. On the right, the five World Dynamics stocks:
@@ -200,8 +200,8 @@ population, natural resources, capital investment, pollution, and the
 fraction of capital in agriculture, each tagged NECESSARY.
 
 PRESS. Part two, intermediate computations, inside the loop. On the left, a
-carrying-capacity factor and a growth rate. On the right, those forty lines,
-which is where most of the feedback structure lives.
+carrying-capacity factor and a growth rate. On the right, those elided helper
+lines, which is where most of the feedback structure lives.
 
 PRESS. Part three, derivative evaluations, one per stock. dN on the left;
 dP, dNR, dCI, dPOL, dCIAF on the right.
@@ -238,7 +238,7 @@ remove, rewrite, reorder. That contract is what keeps every edit runnable.
 
 Move two is the two agents. The Editor is our variation operator. Its prompt,
 on the left, gets the goal, the simulation results, the current code, and
-tree context. The Context panel on the right is the reference for those
+tree context. The Context panel in the middle is the reference for those
 pieces. The edits are structural, not just coefficient tuning: it can add or
 remove state variables, rewire feedback, rewrite equations.
 
@@ -339,7 +339,7 @@ one and gamma is two.
 [The two formula cards rise in, then the kicker.]
 
 Step back and read the same loop formally, because it tells you which theory
-applies. Left card, Equation 2. The Editor is a stochastic transition kernel
+applies. Top row, Equation 2. The Editor is a stochastic transition kernel
 over programs: P u is drawn from P theta, conditioned on the parent program,
 its analysis, the strategy, and the goal. P theta is a pretrained foundation
 model, not something the search learned, but functionally it's the learned
@@ -347,7 +347,7 @@ transition of model-based RL, the AlphaGo Zero and MuZero lineage. Prior
 work used LLM kernels like this in linear search; CEDAR moves them into tree
 search.
 
-Right card, Equation 3. The Judge is a learned value function: analysis and
+Second row, Equation 3. The Judge is a learned value function: analysis and
 score equal R phi of program, record, and goal, and a projection pi S picks
 out the score. S u is a bounded, noisy reward, and that puts us inside the
 convergence analysis of MCTS with biased evaluators: UCT remains consistent
@@ -568,7 +568,7 @@ normal of NOMINAL DR, with standard deviation zero point zero zero five
 times POPULATION. Across ten random seeds you can see its intrinsic
 volatility, and the peaks and dips are not in sync across runs. So the
 volatility is a property of the system, not an optimizer artifact. CEDAR's
-fit sits inside that band and captures the magnitude and timing of the major
+fit generally falls within that band and captures the magnitude and timing of the major
 peaks and dips.
 
 ## 28. A second full-formulae run does not close the gap (1:00 / cum 31:15)
