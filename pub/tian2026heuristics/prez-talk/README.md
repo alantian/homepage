@@ -20,13 +20,11 @@ Keys: `→` / `Space` next build step or slide, `←` back, `F` fullscreen,
 ## Design
 
 Each slide carries a tag naming the paper section it comes from (`§4.3`),
-filled when it is appendix material (`App. C.1`). The progress bar along
-the bottom is a best-so-far staircase: every slide is an "attempt" and the
-line steps up at each section. Section colours: indigo (motivation), green
+filled when it is appendix material (`App. C.1`). The fish progress bar along
+the bottom follows the sibling deck, coloured by section. Section colours: indigo (motivation), green
 (method), ochre (results), crimson (analysis).
 
-Animations: the title and closing slides run a canvas sketch of a policy
-forecasting a ball's flight and moving to meet it. Slide 6 runs the agent
+Animations: slide 6 runs the agent
 loop with packets travelling to and from the platform. Slide 12 shows
 weights flying from `opponent.py` into `policy.py` until a keypress raises
 the shield. Slide 17 draws all 47 models' posterior intervals from the

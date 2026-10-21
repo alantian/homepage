@@ -9,7 +9,7 @@ slides 5, 12, 18, 23, and 27. Everything else animates by itself.
 
 | # | Slide | Tag | Cue |
 |---|---|---|---|
-| 1 | Title | | A policy forecasts the ball and moves to meet it: the idea in one picture. |
+| 1 | Title | | Introduce the benchmark: agents author executable policies. |
 | 2 | A score says how well, rarely how | §1 | One-off solvers vs authored code policies. |
 | 3 | From code-as-policy to Heuristic Learning | §1 §2 | The lineage; our move is to compare models by what they author. |
 | 4 | Five threads | §2 | What each related thread contributes to the design. |
