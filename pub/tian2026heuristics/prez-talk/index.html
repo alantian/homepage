@@ -387,7 +387,8 @@
 <div id="stage">
 <div id="gutter" aria-hidden="true"></div>
 
-<section data-sec="ind" class="slide title-slide">
+<section data-sec="ind" class="slide title-slide fishy">
+  <div class="fish-slot" aria-hidden="true"></div>
   <img src="images/sakana-logo.png" alt="Sakana AI" style="position:absolute;top:56px;left:72px;height:34px">
   <div style="position:relative;max-width:1000px;margin-top:40px">
     <div class="eyebrow-static a-rise">#&nbsp;a benchmark for LLM agents</div>
@@ -1414,7 +1415,8 @@ contact scripts (stand-x offset x jump lead x air direction x contact time) thro
     </div>
   </div>
 </section>
-<section data-sec="crm" class="slide" style="justify-content:center">
+<section data-sec="crm" class="slide fishy" style="justify-content:center">
+  <div class="fish-slot" aria-hidden="true"></div>
   <div style="position:relative;max-width:1000px">
     <div class="eyebrow-static a-rise"># conclusion</div>
     <div class="big3 a-rise d1">Don't just score the agent.<br><span class="accent">Read its policy.</span></div>
@@ -1434,6 +1436,8 @@ contact scripts (stand-x offset x jump lead x air direction x contact time) thro
 </div>
 </div>
 
+<script src="js/p5.min.js"></script>
+<script src="js/sketch.js"></script>
 <script>
 // From the paper: full results table (model, posterior z mean, 95% interval, best) and best-so-far z by attempt.
 const FLEET=[["GPT-6 Astra", 0.846, 0.66, 1.03, 6.043], ["Claude Fable 5.1", 0.658, 0.48, 0.84, 3.787], ["GPT-5.6 Sol", 0.499, 0.32, 0.68, 2.188], ["Claude Fable 5", 0.489, 0.31, 0.67, 1.583], ["DeepSeek V4.1 Flash", 0.436, 0.26, 0.62, 3.851], ["Claude Opus 5", 0.413, 0.23, 0.6, 2.879], ["Muse Spark 1.2", 0.378, -0.09, 0.85, 1.093], ["GPT-5.6 Luna", 0.34, 0.16, 0.52, 2.016], ["Grok 4.6", 0.331, 0.14, 0.52, 1.377], ["Gemini 3.5 Flash-Lite", 0.265, -0.21, 0.74, 1.093], ["Claude Opus 4.8", 0.235, 0.05, 0.42, 1.877], ["GLM-5.2", 0.223, -0.25, 0.69, 0.608], ["Claude Sonnet 5", 0.209, -0.26, 0.68, 0.608], ["Gemini 3.6 Flash", 0.201, 0.01, 0.39, 1.887], ["GPT-5.6 Terra", 0.19, 0.01, 0.37, 1.344], ["Seed 2.1 Turbo", 0.169, -0.3, 0.64, 0.608], ["MiniMax M3", 0.131, -0.34, 0.6, 1.119], ["Qwen3-Max", 0.09, -0.38, 0.56, 0.599], ["GLM-5.3 Flash", 0.085, -0.39, 0.56, 0.608], ["Gemini 3.5 Flash", 0.085, -0.1, 0.27, 3.013], ["Grok 4.20", 0.02, -0.45, 0.49, 0.608], ["GLM-5.3", 0.01, -0.17, 0.19, 2.368], ["Gemini 3.1 Pro", -0.015, -0.2, 0.17, 1.074], ["Kimi K3", -0.093, -0.27, 0.09, 1.247], ["Qwen3.8-2.4T-A95B", -0.1, -0.57, 0.37, 0.599], ["DeepSeek V4 Pro (0813)", -0.231, -0.7, 0.24, 0.608], ["DeepSeek V4 Flash (0731)", -0.272, -0.46, -0.09, 1.093], ["Hy3", -0.282, -0.78, 0.21, 0.479], ["Qwen3.7-Max", -0.358, -0.54, -0.17, 1.417], ["Kimi K2", -0.507, -0.98, -0.04, 0.479], ["Step 3.7 Flash", -0.617, -1.09, -0.15, 0.479], ["Muse Glimmer 30B", -0.743, -1.21, -0.27, 0.479], ["DeepSeek V4 Pro", -0.744, -0.93, -0.56, 1.344], ["Qwen3.8-Max", -0.748, -0.93, -0.57, 0.833], ["Ling 3.0 Flash", -0.76, -1.23, -0.29, 0.428], ["Seed 2.0 Code", -0.785, -1.26, -0.31, 0.608], ["MiMo V2.5", -0.928, -1.4, -0.46, 0.564], ["Kimi K2.6", -0.967, -1.44, -0.5, 0.234], ["Gemini 3.7 Flash", -1.018, -1.49, -0.55, 0.608], ["Mercury 2", -1.075, -1.55, -0.6, 0.438], ["Hy4 Preview", -1.181, -1.65, -0.71, -0.296], ["Qwen3.8-Flash-Next", -1.45, -1.92, -0.98, -0.304], ["Llama 3.1 8B", -1.511, -1.98, -1.04, null], ["Llama 4 Maverick", -1.511, -1.98, -1.04, null], ["Mistral Large 3", -1.511, -1.98, -1.04, null], ["Nova Premier", -1.511, -1.98, -1.04, null], ["Nemotron 3 Super", -1.761, -2.23, -1.29, -1.695]];
@@ -1552,6 +1556,27 @@ const CLIMB=[["GPT-6 Astra", [-22.04, -0.77, -0.06, 0.22, 0.45, 0.53, 0.58, 0.66
     svg.innerHTML=s;
   }
 
+  /* ---- sakana.ai fish school (p5 sketch in js/sketch.js) ---- */
+  window.__fishMount=function(){lifeOn(slides[i].querySelector('.fish-slot'));};
+
+  function lifeOn(slot){
+    const cnv=document.getElementById('defaultCanvas0');
+    if(slot&&!cnv){ // p5 may not have finished setup yet on first show
+      setTimeout(()=>{const s=slides[i].querySelector('.fish-slot');if(s)lifeOn(s);},80);
+      return;
+    }
+    if(!cnv)return;
+    if(slot){
+      if(cnv.parentElement!==slot)slot.appendChild(cnv);
+      cnv.style.display='block';
+      if(reduced||still){redraw();noLoop();}else{loop();}
+    }else{
+      cnv.style.display='none';
+      noLoop();
+    }
+  }
+
+
   /* ---- counters ---- */
   function countUp(sl){
     sl.querySelectorAll('[data-to]').forEach(el=>{
@@ -1573,6 +1598,7 @@ const CLIMB=[["GPT-6 Astra", [-22.04, -0.77, -0.06, 0.22, 0.45, 0.53, 0.58, 0.66
     cur.style.setProperty('--sec',secColor[cur.dataset.sec]);
     document.getElementById('counter').textContent=`${i+1} / ${slides.length}`;
     applyFrags();setHash();drawRail();
+    lifeOn(cur.querySelector('.fish-slot'));
     if(cur.dataset.enter==='count')countUp(cur);
   }
   function next(){if(f<groups[i].length){f++;applyFrags();setHash();}else show(i+1);}

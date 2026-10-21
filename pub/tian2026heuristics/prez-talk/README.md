@@ -24,7 +24,9 @@ filled when it is appendix material (`App. C.1`). The fish progress bar along
 the bottom follows the sibling deck, coloured by section. Section colours: indigo (motivation), green
 (method), ochre (results), crimson (analysis).
 
-Animations: slide 6 runs the agent
+Animations: the title and closing slides run the sakana.ai homepage fish
+school (`js/p5.min.js` + `js/sketch.js`, vendored, as in the sibling deck).
+Slide 6 runs the agent
 loop with packets travelling to and from the platform. Slide 12 shows
 weights flying from `opponent.py` into `policy.py` until a keypress raises
 the shield. Slide 17 draws all 47 models' posterior intervals from the
