@@ -182,3 +182,11 @@ achieve and how they achieve it.
 ## 26. Questions
 
 Thank you.
+
+## 27 to 43. Appendix (backup)
+
+Not part of the timed talk. Jump to them during Q&A with `#/N` or the arrow
+keys: instruction package (28, 29), isolation (30), measurement (31), all 47
+models (32), coverage (33), unshielded exhibit (34), full champion source
+(35), galleries (36, 37), model versions (38), routing (39), RL baselines
+(40), task pairs (41), leaderboards (42), statements (43).

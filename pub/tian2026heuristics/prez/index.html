@@ -21,7 +21,8 @@
     --teal:#0F6B66;           /* primary accent: intro/section color */
     --orange:#CC4400;         /* method section  (paper: CEDAR-Claude color) */
     --purple:#5533AA;         /* results section (paper: Optuna-full color) */
-    --magenta:#AA3366;        /* closing section (paper: population color) */
+    --magenta:#AA3366;
+    --slate:#3D5A80;          /* appendix (backup slides) */        /* closing section (paper: population color) */
     --green:#00AA44;          /* paper: CEDAR-GPT color */
     --line:#D8D6CE;
     --card:#FFFFFF;
@@ -236,6 +237,19 @@
   .current .typed{animation:type 1.5s steps(27,end) 1.1s both}
   @keyframes type{from{width:0}to{width:27ch}}
   .imgcard img{display:block;margin:0 auto}
+  /* appendix: full-roster tables, policy source columns, rollout galleries */
+  table.ftab{flex:1;font-size:11.5px}
+  table.ftab th,table.ftab td{padding:1.5px 6px;white-space:nowrap}
+  table.ftab td{font-family:var(--mono);font-size:11px}
+  table.ftab td:nth-child(2){font-family:var(--sans);font-size:12px}
+  table.ftab td:nth-child(1){color:#A8ADB3}
+  .code.srccol{flex:1;font-size:8.7px;line-height:1.24;padding:8px 10px;min-width:0;white-space:pre-wrap;word-break:break-all}
+  table.ctab th,table.ctab td{padding:3.4px 10px}
+  .code.srccol .ln{width:3ch;margin-right:1.2ch}
+  .ggrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}
+  .ggrid img{width:100%;max-height:150px;object-fit:contain;display:block;border:1px solid var(--line);background:#fff}
+  .ggrid figcaption{margin-top:3px}
+  code{font-family:var(--mono);font-size:.9em}
 </style>
 </head>
 <body>
@@ -835,6 +849,588 @@ RNN_W = [
   <div class="a-rise d4" style="margin-top:30px"><img src="images/sakana-logo.png" alt="Sakana AI" style="height:38px"></div>
 </section>
 
+<!-- ================================================================ -->
+<!-- APPENDIX (backup slides): content of the paper's appendices      -->
+<!-- ================================================================ -->
+
+<!-- A0 -->
+<section data-sec="slate" data-row="a" class="slide" style="justify-content:center">
+  <div class="eyebrow">Appendix</div>
+  <h1 class="a-rise" style="font-size:48px">Backup: <span class="accent">from the appendix</span></h1>
+  <div class="cols stagger fast" style="flex:0 0 auto;gap:28px;margin-top:10px">
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:8px">Tasks and platform</p>
+      <ul class="small"><li class="small">Agent instruction package</li><li class="small">Isolation and validation</li><li class="small">Metrics and measurement</li></ul>
+    </div>
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:8px">Benchmark results</p>
+      <ul class="small"><li class="small">Roster, coverage, pricing</li><li class="small">All 47 models</li><li class="small">Core-model atlas</li></ul>
+    </div>
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:8px">Shielding and policies</p>
+      <ul class="small"><li class="small">Inside an unshielded run</li><li class="small">Full champion source</li><li class="small">Best-policy galleries</li></ul>
+    </div>
+    <div class="col">
+      <p style="font-weight:650;margin-bottom:8px">Analysis</p>
+      <ul class="small"><li class="small">Versions, routing, RL baselines</li><li class="small">Task pairs, leaderboards</li><li class="small">Statements</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- A1 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: agent instruction</div>
+  <h1 class="a-rise">One package per run: <span class="accent">lessons, brief, session contract</span></h1>
+  <div class="cols" style="gap:26px">
+    <div class="col a-rise d1" style="flex:1.05">
+      <div class="tiny soft" style="font-family:var(--mono);margin-bottom:4px">Slime Volleyball task brief (excerpt)</div>
+      <pre class="code wrap" style="font-size:11.5px;line-height:1.42"><span class="c"># Environment brief: slimevolley</span>
+These are GIVEN FACTS about the environment, not strategy.
+- sides: [1, 1], turn order: simultaneous, reward: per_seat
+<span class="k">## Observation</span>
+A 12-vector per acting seat, mirrored per seat:
+[me x,y,vx,vy, ball x,y,vx,vy, opp x,y,vx,vy] / 10.0
+<span class="k">## Actions</span>
+multi_binary, 3 bits: ['forward', 'backward', 'jump']
+<span class="k">## Reward and scoring</span>
+A rally won scores +1 to the winner and -1 to the loser. ...
+KNOWN CEILING: 5 per episode ...
+<span class="k">## The target (what WE measure, zero-trust)</span>
+- opponent pool (1): slimevolley__reference__rnn
+- target seed block: base 99991, stride 101
+  (disjoint from the training block base 4242, stride 13)
+- episodes: 100 paired episodes per opponent
+<span class="k">## Fast eval</span>
+uv run python -m runs.eval --env slimevolley ...</pre>
+    </div>
+    <div class="col a-rise d2" style="display:flex;flex-direction:column;gap:12px">
+      <div class="card acc" style="padding:10px 16px">
+        <h3>Components, in order</h3>
+        <p class="small"><b>Lessons</b> (reusable guidance from outside the current run) &rarr; <b>task brief</b> (interface and evaluation calls) &rarr; <b>session instructions</b> (attempt artifacts, tool use, stopping conditions) &rarr; kickoff line.</p>
+      </div>
+      <div class="tiny soft" style="font-family:var(--mono)">Example global lesson</div>
+      <pre class="code wrap" style="font-size:11.5px;line-height:1.42"><span class="k"># Read real play and write a failure analysis before you edit</span>
+- Before changing the policy, watch or replay ACTUAL episodes and write down why it loses ...
+- Every edit is a hypothesis aimed at ONE named failure. State the prediction before you run it.
+- Do not stack blind edits.</pre>
+      <div class="tiny soft" style="font-family:var(--mono)">Example lesson scoped to competitive tasks</div>
+      <pre class="code wrap" style="font-size:11.5px;line-height:1.42"><span class="k"># Identify the opponent's type before committing to a counter</span>
+... spend early actions to SCOUT the opponent's apparent type or intent, then commit the counter.</pre>
+      <p class="tiny soft">The package exposes the target seed block; reported scores still follow the independent protocol and champion-selection rules.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A2 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: agent instruction</div>
+  <h1 class="a-rise">The session contract: <span class="accent">artifacts, rules, stopping</span></h1>
+  <div class="cols" style="gap:24px;flex:0 0 auto;margin:auto 0;align-items:stretch">
+    <div class="col card a-rise d1">
+      <h3>Per attempt: one hypothesis family</h3>
+      <p class="tiny" style="margin-bottom:6px">A mechanism change plus the parameter sweep that dials it in, in <code>attempt_NN/</code>:</p>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:5px"><code>analysis.md</code> written <b>before</b> the policy: failure analysis with evidence from real play</li>
+        <li class="small" style="margin-bottom:5px"><code>policy.py</code>: <code>make_policy(seat)</code> &rarr; <code>act(obs) -&gt; action</code></li>
+        <li class="small" style="margin-bottom:5px"><code>self_report.json</code>: kept, rationale, built_on, self_score</li>
+        <li class="small" style="margin-bottom:0"><code>trials.jsonl</code>: one line per config evaluated</li>
+      </ul>
+    </div>
+    <div class="col card a-rise d2">
+      <h3>Rules</h3>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:5px"><b>Candidates</b>: proposed lessons must cite the attempt diff and measured delta; zero is a valid outcome</li>
+        <li class="small" style="margin-bottom:5px"><b>Tools</b>: build any analyzers or search harnesses inside the run directory</li>
+        <li class="small" style="margin-bottom:5px">Repository is <b>read-only</b>; never write outside the run directory</li>
+        <li class="small" style="margin-bottom:0"><b>No env self-import</b> as a world model; web access disabled</li>
+      </ul>
+    </div>
+    <div class="col card acc a-rise d3">
+      <h3>Budget and persistence</h3>
+      <p class="tiny" style="margin-bottom:6px">About 12 attempts, ~30 min wall clock, token ceiling. "Budget is fuel, not a deadline." Stop only with a written case:</p>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:5px"><b>PLATEAU</b>: no gain over ~5 attempts and no untested hypothesis</li>
+        <li class="small" style="margin-bottom:5px"><b>RAIL</b>: a budget rail is genuinely near</li>
+        <li class="small" style="margin-bottom:0">A ceiling is never a stopping reason; stopping before half of 12 needs a strong case</li>
+      </ul>
+    </div>
+  </div>
+  <p class="small soft a-rise d4">Self-reports are provenance only: every attempt is re-measured after the run.</p>
+</section>
+
+<!-- A3 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: isolation and validation</div>
+  <h1 class="a-rise">Two sandboxes and <span class="accent">a static import check</span></h1>
+  <div class="cols" style="gap:24px;flex:0 0 auto;margin:auto 0;align-items:stretch">
+    <div class="col card a-rise d1">
+      <h3>Agent workspace</h3>
+      <p class="small">Bubblewrap exposes selected files, API credentials, harness toolchains. A network proxy primarily permits proxied LLM calls.</p>
+      <p class="tiny soft" style="margin-top:6px"><b>Unshielded</b> when no opponent needs protection (e.g. single-player Atari, RAM deliberately exposed). <b>Shielded</b> withholds opponent pool, prior policies, repo history, run records, and for Atari the ROM and emulator.</p>
+    </div>
+    <div class="col card a-rise d2">
+      <h3>Static import checks</h3>
+      <p class="small">Parse to an AST; every <code>import</code> must be a full dotted path to NumPy, the standard library, or <code>core.rng</code>.</p>
+      <p class="tiny soft" style="margin-top:6px">Not a complete security boundary (<code>__import__</code>, <code>importlib</code>, <code>exec</code> can pass), but it forces shortcut behaviours into non-standard code that inspection can identify.</p>
+    </div>
+    <div class="col card a-rise d3">
+      <h3>Execution protections</h3>
+      <p class="small">A separate sandbox unshares all namespaces, disables networking, clears the environment, allows only read-only mounts and a capped tmpfs; process, memory, and time limits.</p>
+      <p class="tiny soft" style="margin-top:6px">Time limits: 32 of 45 tasks at the 90th percentile of exploratory run times; 13 (Melting Pot, MOMAland, SISL Pursuit, Core War) uncapped.</p>
+    </div>
+  </div>
+  <div class="kicker a-rise d4" style="color:var(--sec)">Observed shortcuts used deliberately exposed resources in unshielded ablation runs; no bypass of the shielded sandbox was observed.</div>
+</section>
+
+<!-- A4 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: metrics and measurement</div>
+  <h1 class="a-rise">Scoring, shrinkage, and <span class="accent">failure handling</span></h1>
+  <div class="cols" style="gap:24px;flex:0 0 auto;margin:auto 0;align-items:stretch">
+    <div class="col card a-rise d1">
+      <h3>Scoring</h3>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:6px">Scores follow the source implementations; stochastic tasks average many rollouts</li>
+        <li class="small" style="margin-bottom:6px"><b>Champion</b> = attempt with the best mean score, earliest on ties</li>
+        <li class="small" style="margin-bottom:0">Self-reported scores do not determine selection</li>
+      </ul>
+    </div>
+    <div class="col card a-rise d2">
+      <h3>Statistical model</h3>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:6px">score = overall mean + model effect + residual; task differences enter the residual</li>
+        <li class="small" style="margin-bottom:6px">Method-of-moments variances; models with fewer runs <b>shrink</b> toward the mean</li>
+        <li class="small" style="margin-bottom:0">Interval = mean &plusmn; 1.96 sd: a <i>conditional</i> empirical-Bayes interval, not a frequentist CI</li>
+      </ul>
+    </div>
+    <div class="col card a-rise d3">
+      <h3>Failures</h3>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:6px"><b>Infrastructure</b> failures (API, platform crashes): discarded and rerun</li>
+        <li class="small" style="margin-bottom:6px"><b>Model-caused</b> (budget, stalls, no scorable policy): kept, scored at the random-policy floor (5 seeds)</li>
+        <li class="small" style="margin-bottom:0">A measurable champion is kept even if the run later crashes</li>
+      </ul>
+    </div>
+  </div>
+  <p class="small soft a-rise d4">Each run gets equal weight, so tasks with more repeats contribute more; no adjustment for coverage or difficulty. Rank intervals describe ranking uncertainty, not pairwise tests.</p>
+</section>
+
+<!-- A5 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: all models</div>
+  <h1 class="a-rise" style="margin-bottom:10px">All 47 models in the <span class="accent">primary comparison</span></h1>
+  <div class="cols a-rise d1" style="gap:22px;flex:0 0 auto">
+<table class="ftab"><thead><tr><th>#</th><th>Model</th><th>z</th><th>95% I</th><th>Pct</th><th>First</th><th>All</th><th>Cost</th><th>Min</th></tr></thead><tbody>
+<tr><td>1</td><td>GPT-6 Astra</td><td>+0.846</td><td>[+0.66,+1.03]</td><td>81</td><td>2%</td><td>100%</td><td>$11.20</td><td>24.8</td></tr>
+<tr><td>2</td><td>Claude Fable 5.1</td><td>+0.658</td><td>[+0.48,+0.84]</td><td>70</td><td>29%</td><td>100%</td><td>$5.48</td><td>16.5</td></tr>
+<tr><td>3</td><td>GPT-5.6 Sol</td><td>+0.499</td><td>[+0.32,+0.68]</td><td>71</td><td>3%</td><td>100%</td><td>$6.34</td><td>24.8</td></tr>
+<tr><td>4</td><td>Claude Fable 5</td><td>+0.489</td><td>[+0.31,+0.67]</td><td>68</td><td>19%</td><td>100%</td><td>$11.62</td><td>21.0</td></tr>
+<tr><td>5</td><td>DeepSeek V4.1 Flash</td><td>+0.436</td><td>[+0.26,+0.62]</td><td>62</td><td>41%</td><td>96%</td><td>$0.12</td><td>14.5</td></tr>
+<tr><td>6</td><td>Claude Opus 5</td><td>+0.413</td><td>[+0.23,+0.60]</td><td>65</td><td>12%</td><td>100%</td><td>$5.21</td><td>21.5</td></tr>
+<tr><td>7</td><td>Muse Spark 1.2</td><td>+0.378</td><td>[&minus;0.09,+0.85]</td><td>48</td><td>11%</td><td>100%</td><td>$1.08</td><td>10.5</td></tr>
+<tr><td>8</td><td>GPT-5.6 Luna</td><td>+0.340</td><td>[+0.16,+0.52]</td><td>58</td><td>10%</td><td>99%</td><td>$0.09</td><td>18.0</td></tr>
+<tr><td>9</td><td>Grok 4.6</td><td>+0.331</td><td>[+0.14,+0.52]</td><td>63</td><td>7%</td><td>99%</td><td>$5.51</td><td>22.3</td></tr>
+<tr><td>10</td><td>Gemini 3.5 Flash-Lite</td><td>+0.265</td><td>[&minus;0.21,+0.74]</td><td>49</td><td>22%</td><td>97%</td><td>$0.25</td><td>2.3</td></tr>
+<tr><td>11</td><td>Claude Opus 4.8</td><td>+0.235</td><td>[+0.05,+0.42]</td><td>55</td><td>38%</td><td>99%</td><td>$1.21</td><td>28.8</td></tr>
+<tr><td>12</td><td>GLM-5.2</td><td>+0.223</td><td>[&minus;0.25,+0.69]</td><td>52</td><td>44%</td><td>100%</td><td>$2.50</td><td>24.7</td></tr>
+<tr><td>13</td><td>Claude Sonnet 5</td><td>+0.209</td><td>[&minus;0.26,+0.68]</td><td>51</td><td>56%</td><td>100%</td><td>$1.79</td><td>22.5</td></tr>
+<tr><td>14</td><td>Gemini 3.6 Flash</td><td>+0.201</td><td>[+0.01,+0.39]</td><td>55</td><td>31%</td><td>99%</td><td>$1.48</td><td>16.2</td></tr>
+<tr><td>15</td><td>GPT-5.6 Terra</td><td>+0.190</td><td>[+0.01,+0.37]</td><td>56</td><td>9%</td><td>99%</td><td>$1.57</td><td>13.6</td></tr>
+<tr><td>16</td><td>Seed 2.1 Turbo</td><td>+0.169</td><td>[&minus;0.30,+0.64]</td><td>45</td><td>33%</td><td>100%</td><td>$0.18</td><td>23.9</td></tr>
+<tr><td>17</td><td>MiniMax M3</td><td>+0.131</td><td>[&minus;0.34,+0.60]</td><td>54</td><td>33%</td><td>98%</td><td>$1.48</td><td>28.4</td></tr>
+<tr><td>18</td><td>Qwen3-Max</td><td>+0.090</td><td>[&minus;0.38,+0.56]</td><td>38</td><td>33%</td><td>100%</td><td>$6.09</td><td>23.1</td></tr>
+<tr><td>19</td><td>GLM-5.3 Flash</td><td>+0.085</td><td>[&minus;0.39,+0.56]</td><td>50</td><td>62%</td><td>100%</td><td>$0.09</td><td>29.2</td></tr>
+<tr><td>20</td><td>Gemini 3.5 Flash</td><td>+0.085</td><td>[&minus;0.10,+0.27]</td><td>55</td><td>44%</td><td>99%</td><td>$3.35</td><td>12.6</td></tr>
+<tr><td>21</td><td>Grok 4.20</td><td>+0.020</td><td>[&minus;0.45,+0.49]</td><td>40</td><td>44%</td><td>100%</td><td>$0.70</td><td>3.8</td></tr>
+<tr><td>22</td><td>GLM-5.3</td><td>+0.010</td><td>[&minus;0.17,+0.19]</td><td>50</td><td>51%</td><td>97%</td><td>$1.78</td><td>23.1</td></tr>
+<tr><td>23</td><td>Gemini 3.1 Pro</td><td>&minus;0.015</td><td>[&minus;0.20,+0.17]</td><td>45</td><td>25%</td><td>98%</td><td>$3.08</td><td>18.3</td></tr>
+<tr><td>24</td><td>Kimi K3</td><td>&minus;0.093</td><td>[&minus;0.27,+0.09]</td><td>45</td><td>46%</td><td>99%</td><td>$1.69</td><td>25.0</td></tr>
+</tbody></table>
+<table class="ftab"><thead><tr><th>#</th><th>Model</th><th>z</th><th>95% I</th><th>Pct</th><th>First</th><th>All</th><th>Cost</th><th>Min</th></tr></thead><tbody>
+<tr><td>25</td><td>Qwen3.8-2.4T-A95B</td><td>&minus;0.100</td><td>[&minus;0.57,+0.37]</td><td>37</td><td>71%</td><td>100%</td><td>$1.88</td><td>30.0</td></tr>
+<tr><td>26</td><td>DeepSeek V4 Pro (0813)</td><td>&minus;0.231</td><td>[&minus;0.70,+0.24]</td><td>44</td><td>43%</td><td>100%</td><td>$0.70</td><td>23.4</td></tr>
+<tr><td>27</td><td>DeepSeek V4 Flash (0731)</td><td>&minus;0.272</td><td>[&minus;0.46,&minus;0.09]</td><td>41</td><td>63%</td><td>93%</td><td>$0.07</td><td>21.9</td></tr>
+<tr><td>28</td><td>Hy3</td><td>&minus;0.282</td><td>[&minus;0.78,+0.21]</td><td>35</td><td>100%</td><td>100%</td><td>$0.17</td><td>16.3</td></tr>
+<tr><td>29</td><td>Qwen3.7-Max</td><td>&minus;0.358</td><td>[&minus;0.54,&minus;0.17]</td><td>37</td><td>59%</td><td>97%</td><td>$1.31</td><td>21.8</td></tr>
+<tr><td>30</td><td>Kimi K2</td><td>&minus;0.507</td><td>[&minus;0.98,&minus;0.04]</td><td>37</td><td>38%</td><td>100%</td><td>$0.41</td><td>9.7</td></tr>
+<tr><td>31</td><td>Step 3.7 Flash</td><td>&minus;0.617</td><td>[&minus;1.09,&minus;0.15]</td><td>29</td><td>100%</td><td>100%</td><td>$0.15</td><td>9.8</td></tr>
+<tr><td>32</td><td>Muse Glimmer 30B</td><td>&minus;0.743</td><td>[&minus;1.21,&minus;0.27]</td><td>25</td><td>60%</td><td>100%</td><td>$0.09</td><td>4.4</td></tr>
+<tr><td>33</td><td>DeepSeek V4 Pro</td><td>&minus;0.744</td><td>[&minus;0.93,&minus;0.56]</td><td>26</td><td>62%</td><td>96%</td><td>$0.54</td><td>16.9</td></tr>
+<tr><td>34</td><td>Qwen3.8-Max</td><td>&minus;0.748</td><td>[&minus;0.93,&minus;0.57]</td><td>24</td><td>67%</td><td>98%</td><td>$2.13</td><td>27.0</td></tr>
+<tr><td>35</td><td>Ling 3.0 Flash</td><td>&minus;0.760</td><td>[&minus;1.23,&minus;0.29]</td><td>23</td><td>57%</td><td>88%</td><td>$0.03</td><td>9.1</td></tr>
+<tr><td>36</td><td>Seed 2.0 Code</td><td>&minus;0.785</td><td>[&minus;1.26,&minus;0.31]</td><td>28</td><td>67%</td><td>100%</td><td>$0.32</td><td>13.5</td></tr>
+<tr><td>37</td><td>MiMo V2.5</td><td>&minus;0.928</td><td>[&minus;1.40,&minus;0.46]</td><td>27</td><td>33%</td><td>100%</td><td>$0.10</td><td>11.3</td></tr>
+<tr><td>38</td><td>Kimi K2.6</td><td>&minus;0.967</td><td>[&minus;1.44,&minus;0.50]</td><td>22</td><td>80%</td><td>100%</td><td>$0.34</td><td>17.0</td></tr>
+<tr><td>39</td><td>Gemini 3.7 Flash</td><td>&minus;1.018</td><td>[&minus;1.49,&minus;0.55]</td><td>28</td><td>33%</td><td>100%</td><td>$0.48</td><td>4.9</td></tr>
+<tr><td>40</td><td>Mercury 2</td><td>&minus;1.075</td><td>[&minus;1.55,&minus;0.60]</td><td>22</td><td>86%</td><td>94%</td><td>$0.07</td><td>4.1</td></tr>
+<tr><td>41</td><td>Hy4 Preview</td><td>&minus;1.181</td><td>[&minus;1.65,&minus;0.71]</td><td>19</td><td>100%</td><td>100%</td><td>$0.38</td><td>16.3</td></tr>
+<tr><td>42</td><td>Qwen3.8-Flash-Next</td><td>&minus;1.450</td><td>[&minus;1.92,&minus;0.98]</td><td>16</td><td>0%</td><td>100%</td><td>$0.02</td><td>17.1</td></tr>
+<tr><td>43</td><td>Llama 3.1 8B</td><td>&minus;1.511</td><td>[&minus;1.98,&minus;1.04]</td><td>13</td><td>&ndash;</td><td>&ndash;</td><td>$0.00</td><td>0.1</td></tr>
+<tr><td>44</td><td>Llama 4 Maverick</td><td>&minus;1.511</td><td>[&minus;1.98,&minus;1.04]</td><td>13</td><td>&ndash;</td><td>&ndash;</td><td>$0.02</td><td>1.0</td></tr>
+<tr><td>45</td><td>Mistral Large 3</td><td>&minus;1.511</td><td>[&minus;1.98,&minus;1.04]</td><td>13</td><td>&ndash;</td><td>&ndash;</td><td>$0.11</td><td>3.7</td></tr>
+<tr><td>46</td><td>Nova Premier</td><td>&minus;1.511</td><td>[&minus;1.98,&minus;1.04]</td><td>13</td><td>&ndash;</td><td>0%</td><td>$3.56</td><td>9.5</td></tr>
+<tr><td>47</td><td>Nemotron 3 Super</td><td>&minus;1.761</td><td>[&minus;2.23,&minus;1.29]</td><td>16</td><td>100%</td><td>80%</td><td>$0.01</td><td>19.2</td></tr>
+</tbody></table>
+  </div>
+  <p class="tiny soft" style="margin-top:6px">Weaker models have <b>higher First-attempt rates</b> (later attempts less likely to help); some struggle to produce a measurable policy at all.</p>
+</section>
+
+<!-- A6 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: coverage</div>
+  <h1 class="a-rise">The 19 core models on <span class="accent">core tasks</span></h1>
+  <div class="cols" style="gap:26px">
+    <figure class="a-rise d1" style="flex:0 0 720px">
+      <div class="imgcard"><img src="images/coverage-atlas-core.svg" style="width:100%" alt="z scores of 19 core models on 17 core tasks"></div>
+      <figcaption>Core models on core tasks, restandardized within this subset (crosses: missing).</figcaption>
+    </figure>
+    <div class="col" style="display:flex;flex-direction:column;gap:12px">
+      <div class="card a-rise d2" style="padding:10px 16px">
+        <h3>Coverage</h3>
+        <p class="small">19 core models: <b>3 runs per task</b> on 13 representative tasks, 1 run on the other 32. Other models: 1 run per task on all tasks.</p>
+      </div>
+      <div class="card a-rise d3" style="padding:10px 16px">
+        <h3>Pricing</h3>
+        <p class="small">Token counts &times; listed rates for Claude and GPT; other costs vendor-reported via OpenRouter. Unpriced runs excluded from mean cost.</p>
+      </div>
+      <p class="small a-rise d4">Pong and Door Key cluster near ceilings; Ant and Hopper separate models widely. The mixture avoids uniformly easy or hard tasks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A7 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: shielding exhibit</div>
+  <h1 class="a-rise">Inside an unshielded run: <span class="accent">Qwen3.8-Max on Slime Volleyball</span></h1>
+  <div class="cols" style="gap:24px">
+    <div class="col a-rise d1" style="display:flex;flex-direction:column;gap:8px">
+      <div class="tiny soft" style="font-family:var(--mono)">Second file read</div>
+      <pre class="code wrap" style="font-size:11.5px">[read] platform/refs/slimevolley/slimevolley__reference__rnn.py
+<span class="c">15: # 7x15 weights (row-major) + 7 biases, verbatim from slimevolleygym's BaselinePolicy</span>
+17: _W = [
+18:     <span class="n">7.5719</span>, <span class="n">4.4285</span>, <span class="n">2.2716</span>, <span class="n">-0.3598</span>, <span class="n">-7.8189</span>, ...</pre>
+      <div class="tiny soft" style="font-family:var(--mono)">Weights appearing in the champion policy</div>
+      <pre class="code wrap" style="font-size:11.5px"><span class="c">267: # ---- RNN opponent mirror (verbatim from policies/slimevolley__baseline__rnn.py) ----</span>
+268: RNN_W = [
+269:     <span class="n">7.5719</span>, <span class="n">4.4285</span>, <span class="n">2.2716</span>, <span class="n">-0.3598</span>, <span class="n">-7.8189</span>, ...</pre>
+      <div class="tiny soft" style="font-family:var(--mono)">Shielded champion policy</div>
+      <pre class="code wrap" style="font-size:11.5px"><span class="s">"""attempt_01: ballistic landing-point interceptor (seed baseline). ...
+Predict the ball's first ground contact ballistically ..."""</span></pre>
+    </div>
+    <div class="col a-rise d2" style="display:flex;flex-direction:column;gap:8px">
+      <div class="tiny soft" style="font-family:var(--mono)">Agent's reflection summary (unshielded)</div>
+      <pre class="code wrap" style="font-size:11.5px;line-height:1.45"><span class="k">## What this attempt changes and why</span>
+The shelf carries a measured ceiling-achiever for exactly this env/opponent: ...
+I adopt it (not blind copy: I read its full logic) and RE-VERIFY zero-trust on this box.
+
+THE MECHANISM (why it wins): the rnn opponent is deterministic and its obs is an exact mirror of mine, so I can track its 7-unit hidden state step-for-step. The physics is deterministic with public constants, re-derived as plain arithmetic (no env import).
+...
+contact scripts (stand-x offset x jump lead x air direction x contact time) through exact rollouts against the tracked rnn, committing by a value ladder: confirmed KILL &gt; safe line &gt; emergency save &gt; reactive defense.</pre>
+      <p class="small soft">Under shielding the search for the opponent returns nothing; the agent instead predicts the ball's landing point without modelling the opponent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A8 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: policy source (GPT-6 Astra, attempt 12, n=1000)</div>
+  <h1 class="a-rise" style="margin-bottom:10px">The complete shielded champion: <span class="accent">110 lines, +0.663</span></h1>
+  <div class="cols a-rise d1" style="gap:12px;flex:0 0 auto">
+<pre class="code srccol"><span class="ln">15</span><span class="k">import</span> math
+<span class="ln">16</span>
+<span class="ln">17</span>HOME = <span class="n">8.0</span>
+<span class="ln">18</span>CLEARANCE = <span class="n">5.0</span>
+<span class="ln">19</span>
+<span class="ln">20</span><span class="k">def</span> flight(x, y, vx, vy):
+<span class="ln">21</span>    path = []
+<span class="ln">22</span>    <span class="k">for</span> i <span class="k">in</span> <span class="f">range</span>(<span class="n">100</span>):
+<span class="ln">23</span>        vy -= <span class="n">0.98</span>
+<span class="ln">24</span>        speed = math.sqrt(vx*vx+vy*vy)
+<span class="ln">25</span>        <span class="k">if</span> speed &gt; <span class="n">22.5</span>:
+<span class="ln">26</span>            vx *= <span class="n">22.5</span>/speed
+<span class="ln">27</span>            vy *= <span class="n">22.5</span>/speed
+<span class="ln">28</span>        x += vx/<span class="n">30</span>
+<span class="ln">29</span>        y += vy/<span class="n">30</span>
+<span class="ln">30</span>        <span class="k">if</span> <span class="f">abs</span>(x) &gt; <span class="n">23.5</span>:
+<span class="ln">31</span>            x = <span class="f">max</span>(-<span class="n">23.4966667</span>, <span class="f">min</span>(<span class="n">23.4966667</span>, x))
+<span class="ln">32</span>            vx = -vx
+<span class="ln">33</span>        path.append((x,y,vx,vy))
+<span class="ln">34</span>        <span class="k">if</span> y &lt; <span class="n">2</span>:
+<span class="ln">35</span>            <span class="k">break</span>
+<span class="ln">36</span>    <span class="k">return</span> path
+<span class="ln">37</span>
+<span class="ln">38</span><span class="k">def</span> shot(bx, by, vx, vy, ox):
+<span class="ln">39</span>    speed = math.sqrt(vx*vx+vy*vy)
+<span class="ln">40</span>    <span class="k">if</span> speed &gt; <span class="n">22.5</span>:
+<span class="ln">41</span>        vx *= <span class="n">22.5</span>/speed
+<span class="ln">42</span>        vy *= <span class="n">22.5</span>/speed
+<span class="ln">43</span>    <span class="k">if</span> vx &gt;= -<span class="n">0.1</span>:
+<span class="ln">44</span>        <span class="k">return</span> -<span class="n">25</span> + <span class="f">min</span>(<span class="n">10</span>, vy)*<span class="n">0.2</span> - vx*<span class="n">0.1</span>
+<span class="ln">45</span>    t = -bx/vx
+<span class="ln">46</span>    ny = by+vy*t-<span class="n">14.7</span>*t*t
+<span class="ln">47</span>    <span class="k">if</span> ny &lt; CLEARANCE:
+<span class="ln">48</span>        <span class="k">return</span> -<span class="n">20</span> + ny
+<span class="ln">49</span>    land_t = (vy+math.sqrt(<span class="f">max</span>(<span class="n">0</span>,vy*vy+<span class="n">58.8</span>*(by-<span class="n">2</span>))))/<span class="n">29.4</span>
+<span class="ln">50</span>    land = bx+vx*land_t
+<span class="ln">51</span>    <span class="k">return</span> <span class="n">10</span> + <span class="f">min</span>(<span class="n">10</span>,<span class="f">abs</span>(land+ox))*<span class="n">0.4</span> - <span class="f">max</span>(<span class="n">0</span>,ny-<span class="n">9</span>)*<span class="n">0.1</span>
+<span class="ln">52</span>
+<span class="ln">53</span>SET_VALUE = <span class="n">14</span>
+<span class="ln">54</span>
+<span class="ln">55</span><span class="k">def</span> setup_score(bx,by,vx,vy,sx):</pre>
+<pre class="code srccol"><span class="ln">56</span>    <span class="k">if</span> bx&lt;<span class="n">5</span> <span class="k">or</span> vy&lt;<span class="n">3</span>:
+<span class="ln">57</span>        <span class="k">return</span> -<span class="n">100</span>
+<span class="ln">58</span>    <span class="k">for</span> i,(px,py,ux,uy) <span class="k">in</span> <span class="f">enumerate</span>(flight(bx,by,vx,vy)):
+<span class="ln">59</span>        <span class="k">if</span> px&lt;<span class="n">1.5</span>:
+<span class="ln">60</span>            <span class="k">return</span> -<span class="n">100</span>
+<span class="ln">61</span>        <span class="k">if</span> py&lt;<span class="n">3.2</span> <span class="k">and</span> uy&lt;<span class="n">0</span>:
+<span class="ln">62</span>            <span class="k">if</span> i&gt;<span class="n">12</span> <span class="k">and</span> <span class="n">2.5</span>&lt;px&lt;<span class="f">min</span>(<span class="n">10</span>,bx-<span class="n">2</span>) <span class="k">and</span> <span class="f">abs</span>(px-sx)&lt;<span class="n">17.5</span>*(i+<span class="n">1</span>)/<span class="n">30</span>:
+<span class="ln">63</span>                <span class="k">return</span> SET_VALUE-<span class="n">0.3</span>*px-<span class="n">0.015</span>*i
+<span class="ln">64</span>            <span class="k">return</span> -<span class="n">100</span>
+<span class="ln">65</span>    <span class="k">return</span> -<span class="n">100</span>
+<span class="ln">66</span>
+<span class="ln">67</span><span class="k">def</span> make_policy(seat):
+<span class="ln">68</span>    armed = <span class="k">False</span>
+<span class="ln">69</span>    <span class="k">def</span> act(obs):
+<span class="ln">70</span>        <span class="k">nonlocal</span> armed
+<span class="ln">71</span>        x,y,vx,vy,bx,by,bvx,bvy,ox,oy,ovx,ovy = [<span class="f">float</span>(v)*<span class="n">10</span> <span class="k">for</span> v <span class="k">in</span> obs]
+<span class="ln">72</span>        <span class="k">if</span> bx&lt;<span class="n">0</span> <span class="k">or</span> (<span class="f">abs</span>(bx)&lt;<span class="n">0.001</span> <span class="k">and</span> <span class="f">abs</span>(by-<span class="n">12</span>)&lt;<span class="n">0.001</span>):
+<span class="ln">73</span>            armed = <span class="k">False</span>
+<span class="ln">74</span>        path = flight(bx,by,bvx,bvy)
+<span class="ln">75</span>        lx = <span class="f">next</span>((p[<span class="n">0</span>] <span class="k">for</span> p <span class="k">in</span> path <span class="k">if</span> p[<span class="n">1</span>]&lt;<span class="n">3.2</span>),path[-<span class="n">1</span>][<span class="n">0</span>])
+<span class="ln">76</span>        fallback = <span class="f">max</span>(<span class="n">2</span>,<span class="f">min</span>(<span class="n">22.5</span>,lx)) <span class="k">if</span> lx &gt; <span class="n">0</span> <span class="k">else</span> HOME
+<span class="ln">77</span>        best = -<span class="n">1e9</span>
+<span class="ln">78</span>        best_set = <span class="k">False</span>
+<span class="ln">79</span>        best_i = -<span class="n">1</span>
+<span class="ln">80</span>        choice = (-<span class="n">1</span> <span class="k">if</span> x&gt;fallback+<span class="n">0.25</span> <span class="k">else</span> <span class="n">1</span> <span class="k">if</span> x&lt;fallback-<span class="n">0.25</span> <span class="k">else</span> <span class="n">0</span>,<span class="n">0</span>)
+<span class="ln">81</span>        <span class="k">if</span> bx &lt; -<span class="n">5</span> <span class="k">and</span> bvx &lt; <span class="n">0</span>:
+<span class="ln">82</span>            <span class="k">return</span> [<span class="f">int</span>(choice[<span class="n">0</span>]&lt;<span class="n">0</span>),<span class="f">int</span>(choice[<span class="n">0</span>]&gt;<span class="n">0</span>),<span class="n">0</span>]
+<span class="ln">83</span>        <span class="k">for</span> jump <span class="k">in</span> (<span class="n">0</span>,<span class="n">1</span>) <span class="k">if</span> y &lt; <span class="n">1.51</span> <span class="k">else</span> (<span class="n">0</span>,):
+<span class="ln">84</span>            sy,svy = y,vy
+<span class="ln">85</span>            vertical = []
+<span class="ln">86</span>            targets = {<span class="f">round</span>(fallback*<span class="n">12</span>)/<span class="n">12</span>}
+<span class="ln">87</span>            <span class="k">for</span> i,(px,py,ux,uy) <span class="k">in</span> <span class="f">enumerate</span>(path[:<span class="n">65</span>]):
+<span class="ln">88</span>                svy = <span class="n">13.5</span>*jump <span class="k">if</span> sy &lt;= <span class="n">1.5034</span> <span class="k">else</span> svy-<span class="n">0.98</span>
+<span class="ln">89</span>                sy = <span class="f">max</span>(<span class="n">1.5</span>,sy+svy/<span class="n">30</span>)
+<span class="ln">90</span>                <span class="k">if</span> sy == <span class="n">1.5</span>:</pre>
+<pre class="code srccol"><span class="ln">91</span>                    svy = <span class="n">0</span>
+<span class="ln">92</span>                vertical.append((sy,svy))
+<span class="ln">93</span>                <span class="k">if</span> px&gt;<span class="n">0</span> <span class="k">and</span> <span class="n">0</span>&lt;py-sy&lt;<span class="n">2.5</span> <span class="k">and</span> <span class="f">abs</span>(px-x)&lt;<span class="n">17.5</span>*(i+<span class="n">1</span>)/<span class="n">30</span>+<span class="n">2</span>:
+<span class="ln">94</span>                    <span class="k">for</span> off <span class="k">in</span> (-<span class="n">0.9</span>,<span class="n">0</span>,<span class="n">0.9</span>):
+<span class="ln">95</span>                        targets.add(<span class="f">round</span>(<span class="f">max</span>(<span class="n">2</span>,<span class="f">min</span>(<span class="n">22.5</span>,px+off))*<span class="n">12</span>)/<span class="n">12</span>)
+<span class="ln">96</span>            <span class="c"># Close destinations duplicate the same actuator sequence.</span>
+<span class="ln">97</span>            <span class="k">for</span> target <span class="k">in</span> <span class="f">sorted</span>(targets):
+<span class="ln">98</span>                sx = x
+<span class="ln">99</span>                first = <span class="n">0</span>
+<span class="ln">100</span>                <span class="k">for</span> i,((px,py,ux,uy),(sy,svy)) <span class="k">in</span> <span class="f">enumerate</span>(<span class="f">zip</span>(path,vertical)):
+<span class="ln">101</span>                    a = -<span class="n">1</span> <span class="k">if</span> sx&gt;target+<span class="n">0.25</span> <span class="k">else</span> <span class="n">1</span> <span class="k">if</span> sx&lt;target-<span class="n">0.25</span> <span class="k">else</span> <span class="n">0</span>
+<span class="ln">102</span>                    <span class="k">if</span> i == <span class="n">0</span>:
+<span class="ln">103</span>                        first = a
+<span class="ln">104</span>                    oldx = sx
+<span class="ln">105</span>                    sx = <span class="f">max</span>(<span class="n">2</span>,<span class="f">min</span>(<span class="n">22.5</span>,sx+a*<span class="n">17.5</span>/<span class="n">30</span>))
+<span class="ln">106</span>                    pvx = (sx-oldx)*<span class="n">30</span>
+<span class="ln">107</span>                    dx,dy = px-sx,py-sy
+<span class="ln">108</span>                    d2 = dx*dx+dy*dy
+<span class="ln">109</span>                    <span class="k">if</span> <span class="n">0.001</span>&lt;d2&lt;<span class="n">4</span>:
+<span class="ln">110</span>                        d = math.sqrt(d2)
+<span class="ln">111</span>                        nx,ny = dx/d,dy/d
+<span class="ln">112</span>                        un = (ux-pvx)*nx+(uy-svy)*ny
+<span class="ln">113</span>                        outx,outy = ux-<span class="n">2</span>*un*nx,uy-<span class="n">2</span>*un*ny
+<span class="ln">114</span>                        attack = shot(px,py,outx,outy,ox)
+<span class="ln">115</span>                        setting = setup_score(px,py,outx,outy,sx) <span class="k">if</span> <span class="k">not</span> armed <span class="k">else</span> -<span class="n">100</span>
+<span class="ln">116</span>                        score = <span class="f">max</span>(attack,setting)-<span class="n">0.012</span>*i
+<span class="ln">117</span>                        <span class="k">if</span> score&gt;best:
+<span class="ln">118</span>                            best,choice = score,(first,jump)
+<span class="ln">119</span>                            best_set,best_i = setting&gt;attack,i
+<span class="ln">120</span>                        <span class="k">break</span>
+<span class="ln">121</span>        <span class="k">if</span> best_set <span class="k">and</span> best_i == <span class="n">0</span>:
+<span class="ln">122</span>            armed = <span class="k">True</span>
+<span class="ln">123</span>        <span class="k">return</span> [<span class="f">int</span>(choice[<span class="n">0</span>]&lt;<span class="n">0</span>),<span class="f">int</span>(choice[<span class="n">0</span>]&gt;<span class="n">0</span>),choice[<span class="n">1</span>]]
+<span class="ln">124</span>    <span class="k">return</span> act</pre>
+  </div>
+  
+</section>
+
+<!-- A9 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: best-policy galleries</div>
+  <h1 class="a-rise" style="margin-bottom:14px">Champions at play <span class="accent">(1 / 2)</span></h1>
+  <div class="ggrid stagger fast">
+    <figure><img src="images/strip-mspacman_ari.png" alt="Ms. Pac-Man rollout"><figcaption>Ms. Pac-Man, GPT-6 Astra, 29,881</figcaption></figure>
+    <figure><img src="images/strip-seaquest_ari.png" alt="Seaquest rollout"><figcaption>Seaquest, DeepSeek V4.1 Flash, 79,220</figcaption></figure>
+    <figure><img src="images/strip-minigrid_keycorridor.png" alt="Key Corridor rollout"><figcaption>Key Corridor, Claude Fable 5, 0.951</figcaption></figure>
+    <figure><img src="images/strip-corewar.png" alt="Core War rollout"><figcaption>Core War, GPT-6 Astra, 0.843</figcaption></figure>
+    <figure><img src="images/strip-mujoco_hopper.png" alt="Hopper rollout"><figcaption>Hopper (shielded), Claude Fable 5.1, 3,732.019</figcaption></figure>
+    <figure><img src="images/strip-mujoco_walker2d.png" alt="Walker2d rollout"><figcaption>Walker2d, Qwen3.7-Max, 5,635.257</figcaption></figure>
+  </div>
+  <p class="tiny soft" style="margin-top:6px">An episode from one of the highest-scoring policies per task, with authoring model and held-out score.</p>
+</section>
+
+<!-- A10 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: best-policy galleries</div>
+  <h1 class="a-rise" style="margin-bottom:14px">Champions at play <span class="accent">(2 / 2)</span></h1>
+  <div class="ggrid stagger fast">
+    <figure><img src="images/strip-momaland_breakthrough.png" alt="Breakthrough rollout"><figcaption>Breakthrough, GPT-6 Astra, 3.051</figcaption></figure>
+    <figure><img src="images/strip-overcooked.png" alt="Overcooked rollout"><figcaption>Overcooked (shielded), GPT-6 Astra, 210</figcaption></figure>
+    <figure><img src="images/strip-meltingpot_commons_harvest.png" alt="Commons Harvest rollout"><figcaption>Commons Harvest, Claude Fable 5.1, 433.76</figcaption></figure>
+    <figure><img src="images/strip-sisl_pursuit.png" alt="Pursuit rollout"><figcaption>Pursuit, Claude Fable 5.1, 134.102</figcaption></figure>
+  </div>
+  <p class="small soft" style="margin-top:10px">Full galleries cover all tasks in the paper's appendix.</p>
+</section>
+
+<!-- A11 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: model versions</div>
+  <h1 class="a-rise">Newer versions improve <span class="accent">unevenly</span></h1>
+  <div class="cols" style="gap:30px">
+    <figure class="a-rise d1" style="flex:0 0 420px">
+      <div class="imgcard"><img src="images/version-pairs.svg" style="max-height:440px" alt="Per-task z for four older/newer model pairs"></div>
+      <figcaption>Hollow: older model. Solid: newer model.</figcaption>
+    </figure>
+    <div class="col" style="display:flex;flex-direction:column;gap:14px">
+      <table class="a-rise d2" style="font-size:16px">
+        <thead><tr><th>Older &rarr; newer</th><th style="text-align:right">Improved</th><th style="text-align:right">Tie</th><th style="text-align:right">Regressed</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Fable 5 &rarr; 5.1</td><td class="num">22</td><td class="num">14</td><td class="num">9</td></tr>
+          <tr><td>GPT-5.6 Sol &rarr; GPT-6 Astra</td><td class="num">24</td><td class="num">16</td><td class="num">5</td></tr>
+          <tr class="hl"><td>DeepSeek V4 Pro &rarr; V4.1 Flash</td><td class="num">34</td><td class="num">3</td><td class="num">4</td></tr>
+          <tr><td>Gemini 3.5 Flash &rarr; 3.6 Flash</td><td class="num">16</td><td class="num">10</td><td class="num">15</td></tr>
+        </tbody>
+      </table>
+      <ul class="stagger late">
+        <li class="small">Every pair includes regressions</li>
+        <li class="small">Many ties occur at scoring ceilings</li>
+        <li class="small">Larger gains for DeepSeek on discrete puzzle games; for Claude and Gemini on continuous control and multiplayer games</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- A12 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: routing-based models</div>
+  <h1 class="a-rise">Fugu and Fugu Ultra, <span class="accent">refit over 49 models</span></h1>
+  <table class="a-rise d1" style="font-size:16px;width:100%;margin-top:4px">
+    <thead><tr><th>Model</th><th>Rank interval</th><th>z mean</th><th>z interval</th><th>Percentile</th><th>Percentile interval</th></tr></thead>
+    <tbody style="font-family:var(--mono);font-size:15px">
+      <tr class="hl"><td style="font-family:var(--sans)"><b>Fugu Ultra</b></td><td>[1, 4]</td><td>+0.776</td><td>[+0.59, +0.96]</td><td>77.2</td><td>[72.2, 82.2]</td></tr>
+      <tr><td style="font-family:var(--sans)">GPT-6 Astra</td><td>[1, 4]</td><td>+0.745</td><td>[+0.56, +0.93]</td><td>78.8</td><td>[73.9, 83.7]</td></tr>
+      <tr class="hl"><td style="font-family:var(--sans)"><b>Fugu</b></td><td>[1, 8]</td><td>+0.587</td><td>[+0.40, +0.77]</td><td>69.8</td><td>[64.8, 74.8]</td></tr>
+      <tr><td style="font-family:var(--sans)">Claude Fable 5.1</td><td>[2, 9]</td><td>+0.572</td><td>[+0.39, +0.75]</td><td>67.3</td><td>[62.4, 72.1]</td></tr>
+      <tr><td style="font-family:var(--sans)">GPT-5.6 Sol</td><td>[3, 13]</td><td>+0.441</td><td>[+0.26, +0.62]</td><td>68.4</td><td>[63.5, 73.3]</td></tr>
+      <tr><td style="font-family:var(--sans)">Claude Fable 5</td><td>[3, 14]</td><td>+0.428</td><td>[+0.25, +0.61]</td><td>65.5</td><td>[60.7, 70.4]</td></tr>
+    </tbody>
+  </table>
+  <div class="cols stagger late" style="flex:0 0 auto;margin-top:20px;gap:22px">
+    <div class="col card"><h3>Setup</h3><p class="tiny">Both through Codex at high reasoning, same 30-minute budget and 12-attempt target. Excluded from the primary comparison because the mechanism differs.</p></div>
+    <div class="col card"><h3>Weaker cases</h3><p class="tiny">Fugu: Unlock Pickup, Pursuit (Prey), Clean Up. Fugu Ultra: Core War, Prisoner's Dilemma, Beach. Advantages may be task-dependent.</p></div>
+    <div class="col card"><h3>Cost caveat</h3><p class="tiny">Fugu's cost is unavailable (selected model undisclosed); Fugu Ultra's omits orchestration tokens and is a lower bound.</p></div>
+  </div>
+</section>
+
+<!-- A13 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: trained RL baselines</div>
+  <h1 class="a-rise">PPO on Hopper, SAC on Humanoid: <span class="accent">the details</span></h1>
+  <div class="cols" style="gap:24px;flex:0 0 auto;margin:auto 0;align-items:stretch">
+    <div class="col card a-rise d1">
+      <h3>Shared</h3>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:6px">Stable-Baselines3, Gymnasium over MuJoCo (v5)</li>
+        <li class="small" style="margin-bottom:6px">Defaults without tuning, 3 changes: 2&times;256 hidden layers; SAC 10k warm-up; per-task budgets</li>
+        <li class="small" style="margin-bottom:6px">Proprioceptive observations, the same inputs code policies receive</li>
+        <li class="small" style="margin-bottom:0">lr 0.0003, discount 0.99; final policy, no checkpoint selection</li>
+      </ul>
+    </div>
+    <div class="col card a-rise d2">
+      <h3>PPO &middot; Hopper-v5</h3>
+      <div><span class="chip">10<sup>6</sup> steps</span><span class="chip">8 envs</span><span class="chip">2,048-step rollouts</span><span class="chip">batch 64</span><span class="chip">10 epochs</span><span class="chip">GAE 0.95</span><span class="chip">clip 0.2</span><span class="chip">entropy 0</span></div>
+      <p class="tiny soft">Library defaults, not the Zoo's tuned Hopper entry.</p>
+      <h3 style="margin-top:10px">SAC &middot; Humanoid-v5</h3>
+      <div><span class="chip">2&times;10<sup>6</sup> steps</span><span class="chip">1 env</span><span class="chip">buffer 10<sup>6</sup></span><span class="chip">batch 256</span><span class="chip">1 update/step</span><span class="chip">&tau; 0.005</span></div>
+      <p class="tiny soft">Changes follow the RL Baselines3 Zoo Humanoid entry.</p>
+    </div>
+    <div class="col card a-rise d3">
+      <h3>Evaluation and references</h3>
+      <ul class="small" style="padding-left:18px">
+        <li class="small" style="margin-bottom:6px">30 episodes; mean and population sd across episodes, not seeds</li>
+        <li class="small" style="margin-bottom:6px">Random reference: uniformly sampled actions</li>
+        <li class="small" style="margin-bottom:6px">Hopper <b>3,800</b>: registered Gymnasium reward threshold</li>
+        <li class="small" style="margin-bottom:0">Humanoid <b>6,000</b>: rounded strong-agent score (SAC, Zoo); a reference, not a completion criterion</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- A14 -->
+<section data-sec="slate" data-row="b" class="slide">
+  <div class="eyebrow">Appendix: cross-task similarity</div>
+  <h1 class="a-rise">Task pairs: <span class="accent">performance is not uniformly related</span></h1>
+  <figure class="a-rise d1">
+    <div class="imgcard"><img src="images/env-scatter.svg" style="width:100%" alt="Within-task z for four task pairs"></div>
+    <figcaption>Four non-overlapping task pairs: each model's within-task z on both tasks.</figcaption>
+  </figure>
+  <ul class="stagger late" style="margin-top:16px">
+    <li class="small">Kendall's &tau;<sub>b</sub> on model rankings per task pair; excludes 3 tasks with no score variation and 9 where more than half the measured models tie</li>
+    <li class="small">528 eligible pairs across 33 tasks: median &tau;<sub>b</sub> = +0.298, 73 negative</li>
+    <li class="small">Different responses to individual tasks favour evaluation across diverse tasks</li>
+  </ul>
+</section>
+
+<!-- A15 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: established benchmarks</div>
+  <h1 class="a-rise" style="margin-bottom:12px">All 15 leaderboards, and <span class="accent">ALE-Bench rank by rank</span></h1>
+  <div class="cols" style="gap:24px">
+    <table class="ctab a-rise d1" style="font-size:13px;flex:0 0 430px">
+      <thead><tr><th>Benchmark (metric)</th><th style="text-align:right">Shared</th><th style="text-align:right">&tau;<sub>b</sub></th></tr></thead>
+      <tbody>
+        <tr><td>SEC-bench Pro (Pass@1)</td><td class="num">5</td><td class="num">+0.800</td></tr>
+        <tr><td>Agents' Last Exam (Score)</td><td class="num">15</td><td class="num">+0.600</td></tr>
+        <tr><td>ExploitGym (Pass@1)</td><td class="num">6</td><td class="num">+0.600</td></tr>
+        <tr class="hl"><td>ALE-Bench (mean perf.)</td><td class="num">37</td><td class="num">+0.570</td></tr>
+        <tr><td>ProgramBench (Almost@1)</td><td class="num">8</td><td class="num">+0.500</td></tr>
+        <tr><td>Terminal-Bench 4.0</td><td class="num">12</td><td class="num">+0.485</td></tr>
+        <tr><td>Terminal-Bench 3.0</td><td class="num">11</td><td class="num">+0.455</td></tr>
+        <tr><td>DeepSWE v1.1</td><td class="num">20</td><td class="num">+0.400</td></tr>
+        <tr><td>Chartography (no tools)</td><td class="num">22</td><td class="num">+0.399</td></tr>
+        <tr><td>CyberGym</td><td class="num">13</td><td class="num">+0.348</td></tr>
+        <tr><td>ZeroBench-main (Pass@5, tools)</td><td class="num">9</td><td class="num">+0.333</td></tr>
+        <tr><td>AutomationBench (public)</td><td class="num">10</td><td class="num">+0.289</td></tr>
+        <tr><td>Terminal-Bench 2.1</td><td class="num">23</td><td class="num">+0.258</td></tr>
+        <tr><td>BabyVision</td><td class="num">7</td><td class="num">+0.238</td></tr>
+        <tr><td>NL2Repo-Bench</td><td class="num">13</td><td class="num">+0.026</td></tr>
+      </tbody>
+    </table>
+    <div class="col" style="display:flex;flex-direction:column;gap:10px">
+      <figure class="a-rise d2"><div class="imgcard"><img src="images/ale-bench-order.svg" style="width:100%" alt="Our percentile ranks versus ALE-Bench ranks for 37 shared models"></div>
+      <figcaption>Our percentile ranks versus ALE-Bench's (rank 1 is best).</figcaption></figure>
+      <p class="small a-rise d3">Rankings broadly agree, with many fine-grained differences.</p>
+      <p class="tiny soft a-rise d4">At least 5 shared models, matched by registry identifier; scores reused as-is (highest listed, disputed variants excluded); lower-is-better metrics reversed. Descriptive agreement in model ordering, limited by overlap, harnesses, reasoning settings, and score sources.</p>
+    </div>
+  </div>
+</section>
+
+<!-- A16 -->
+<section data-sec="slate" data-row="a" class="slide">
+  <div class="eyebrow">Appendix: statements</div>
+  <h1 class="a-rise">Ethics, reproducibility, <span class="accent">AI use</span></h1>
+  <div class="cols" style="gap:24px;flex:0 0 auto;margin:auto 0;align-items:stretch">
+    <div class="col card a-rise d1">
+      <h3>Ethics</h3>
+      <p class="small">Emphasizes proper shielding when evaluating agents to prevent unwanted behaviours. Built on publicly available tasks, which should ease use of the benchmark. No other ethical concerns identified.</p>
+    </div>
+    <div class="col card a-rise d2">
+      <h3>Reproducibility</h3>
+      <p class="small">Task references and implementation details, metrics and measurement, isolation and validation, and the model roster are given in the appendix. Downloadable source code is provided as supplementary material.</p>
+    </div>
+    <div class="col card a-rise d3">
+      <h3>AI use</h3>
+      <p class="small">Generative AI assisted methodology feedback, implementation, qualitative analysis, figures, code, brainstorming, and literature discovery; not used to interpret results. All AI-assisted work was reviewed; the authors take responsibility for the content.</p>
+    </div>
+  </div>
+</section>
+
 <svg id="rail" aria-hidden="true"></svg>
 <div id="counter"></div>
 <div id="help">→ or tap right: next / ← or tap left: back / swipe / F fullscreen</div>
@@ -849,7 +1445,7 @@ RNN_W = [
   const slides=[...document.querySelectorAll('.slide')];
   // eyebrow numbers follow slide order (title slide has none, so index == displayed number)
   slides.forEach((sl,k)=>{const e=sl.querySelector('.eyebrow');if(e&&!/^\d\d \//.test(e.textContent))e.textContent=String(k).padStart(2,'0')+' / '+e.textContent;});
-  const secColor={teal:'#0F6B66',orange:'#CC4400',purple:'#5533AA',magenta:'#AA3366'};
+  const secColor={teal:'#0F6B66',orange:'#CC4400',purple:'#5533AA',magenta:'#AA3366',slate:'#3D5A80'};
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const still=new URLSearchParams(location.search).has('still');
   if(still)document.documentElement.classList.add('still');
@@ -883,7 +1479,7 @@ RNN_W = [
   /* ---- signature: slide progress as a small search tree ---- */
   const rail=document.getElementById('rail');
   function drawRail(){
-    const n=slides.length,dx=25,h=52;
+    const n=slides.length,dx=Math.min(25,Math.floor(1000/n)),h=52; // compress the rail for long decks
     rail.setAttribute('width',n*dx+18);rail.setAttribute('height',h);
     const FISH='M0 554.58C0 539.58 12.28 527.30 27.28 527.30C137.78 527.30 237.37 570.95 311.03 641.90C350.59 588.70 376.51 524.72 381.97 453.78L154.15 452.53C139.15 452.53 126.87 440.26 126.87 425.25C126.87 410.24 139.15 397.97 154.15 397.97L410.62 397.97C582.50 397.97 744.84 464.81 866.25 586.22L941.28 661.25C946.73 666.71 949.46 673.53 949.46 680.35C949.46 687.17 946.73 693.99 941.28 699.45L866.25 774.48C744.84 896.89 582.50 963.73 410.62 963.73L154.15 963.73C139.15 963.73 126.87 951.46 126.87 936.45C126.87 921.44 139.15 909.17 154.15 909.17L381.97 909.17C376.51 839.69 350.59 774.21 311.03 721.01C237.37 791.95 137.78 835.60 27.28 835.60C12.28 835.60 0 823.32 0 808.32C0 793.31 12.28 781.03 27.28 781.03C124.14 781.03 211.45 742.84 275.56 680.09C211.45 617.33 124.14 579.14 27.28 579.14C12.28 581.87 0 569.59 0 554.58ZM883.98 682.81L828.05 626.88C723.01 521.84 585.23 460.45 436.53 455.00C431.08 540.94 398.34 620.06 347.86 682.81C398.34 745.57 431.08 824.69 436.53 910.63C583.87 903.81 723.01 843.79 828.05 738.74L883.98 682.81Z';
     let x=11,prev=null,parts=[
